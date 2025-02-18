@@ -1,182 +1,125 @@
-// import 'package:flutter/material.dart';
-// import '../services/api_service.dart';
-// import '../models/event_model.dart';
-
-// class CalendarScreen extends StatefulWidget {
-//   @override
-//   _CalendarScreenState createState() => _CalendarScreenState();
-// }
-
-// class _CalendarScreenState extends State<CalendarScreen> {
-//   late Future<List<Event>> events;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     events = ApiService().fetchEvents();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Event Calendar')),
-//       body: FutureBuilder<List<Event>>(
-//         future: events,
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return Center(child: CircularProgressIndicator());
-//           } else if (snapshot.hasError) {
-//             return Center(child: Text('Error: ${snapshot.error}'));
-//           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-//             return Center(child: Text('No events available'));
-//           } else {
-//             return ListView.builder(
-//               itemCount: snapshot.data!.length,
-//               itemBuilder: (context, index) {
-//                 final event = snapshot.data![index];
-//                 return Card(
-//                   margin: EdgeInsets.all(8.0),
-//                   child: ListTile(
-//                     title: Text(event.title),
-//                     subtitle: Text(
-//                         '${event.startTime} - ${event.endTime}\nType: ${event.type}\nPlace: ${event.place}'),
-//                   ),
-//                 );
-//               },
-//             );
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
-
-import 'package:event_management_app/widgets/calendar_widget.dart';
+import 'package:event_management_app/screens/login.dart';
 import 'package:flutter/material.dart';
+import 'package:event_management_app/services/api_service.dart';
+import 'package:event_management_app/models/event_model.dart';
+import 'package:event_management_app/widgets/calendar_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
+  const CalendarScreen({super.key});
+
   @override
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  late Future<Map<DateTime, List<Event>>> _eventsFuture;
   DateTime _selectedDate = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.month;
 
-  // Map to store event details
-  Map<DateTime, List<Map<String, dynamic>>> _events = {
-    _normalizeDate(DateTime(2025, 1, 20)): [
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description":
-            "សំណើអញ្ជើញចូលរួម: Contracts - Detail on multiple meetings on the same day",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "09:00AM - 10:00AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 255, 198, 12),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 0, 85, 3),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 27, 0, 122),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 0, 124, 0),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 172, 0, 134),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 110, 3, 21),
-      },
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Contracts - Additional detail",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "10:30AM - 11:30AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 0, 182, 127),
-      },
-    ],
-    _normalizeDate(DateTime(2025, 1, 22)): [
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Same day another meeting",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "09:00AM - 10:00AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 255, 213, 150),
-      },
-    ],
-    _normalizeDate(DateTime(2025, 1, 25)): [
-      {
-        "title": "កិច្ចប្រជុំ",
-        "description": "សំណើអញ្ជើញចូលរួម: Another meeting on the same day",
-        "location": "បន្ទប់ប្រជុំច្រកចេញ-ចូលតែមួយ",
-        "time": "09:00AM - 10:00AM",
-        "participants": ["លោក សេង​ ស៊ុនលី"],
-        "color": const Color.fromARGB(255, 241, 162, 255),
-      },
-    ],
-  };
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = _fetchEventsFromApi();
+  }
+
+  Future<Map<DateTime, List<Event>>> _fetchEventsFromApi() async {
+    final eventsList = await ApiService().fetchEvents();
+    final Map<DateTime, List<Event>> eventsMap = {};
+
+    for (var event in eventsList) {
+      final date = event.startTime;
+      final normalizedDate = _normalizeDate(date);
+      if (!eventsMap.containsKey(normalizedDate)) {
+        eventsMap[normalizedDate] = [];
+      }
+      eventsMap[normalizedDate]?.add(event);
+    }
+
+    return eventsMap;
+  }
 
   static DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
-  List<Map<String, dynamic>> _getEventDetailsForSelectedDate() {
-    return _events[_normalizeDate(_selectedDate)] ?? [];
+  List<Event> _getEventDetailsForSelectedDate(
+      Map<DateTime, List<Event>> events) {
+    return events[_normalizeDate(_selectedDate)] ?? [];
   }
 
   @override
   Widget build(BuildContext context) {
-    _getEventDetailsForSelectedDate();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: Text(
+          'CIB event management',
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            fontFamily:
+                'YourCustomFont', // Replace with your custom font family
+            color: const Color.fromARGB(255, 0, 33, 105),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'logout') {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (Route<dynamic> route) => false,
+                  );
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem<String>(
+                    value: 'logout',
+                    child: Text('Logout'),
+                  ),
+                ];
+              },
+              child: CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: CalendarWidget(
-        selectedDate: _selectedDate,
-        calendarFormat: _calendarFormat,
-        onDaySelected: (selectedDay, focusedDay) {
-          setState(() {
-            _selectedDate = selectedDay;
-          });
+      body: FutureBuilder<Map<DateTime, List<Event>>>(
+        future: _eventsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No events available'));
+          } else {
+            final events = snapshot.data!;
+            final eventDetails = _getEventDetailsForSelectedDate(events);
+            return CalendarWidget(
+              selectedDate: _selectedDate,
+              calendarFormat: _calendarFormat,
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDate = selectedDay;
+                });
+              },
+              onFormatChanged: (format) {
+                setState(() {
+                  _calendarFormat = format;
+                });
+              },
+              events: events,
+              eventDetails: eventDetails,
+            );
+          }
         },
-        onFormatChanged: (format) {
-          setState(() {
-            _calendarFormat = format;
-          });
-        },
-        events: _events,
-        eventDetails: _getEventDetailsForSelectedDate(),
       ),
     );
   }

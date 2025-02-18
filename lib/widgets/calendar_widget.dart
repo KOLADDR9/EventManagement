@@ -1,160 +1,200 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import the package for date formatting
 import 'package:table_calendar/table_calendar.dart';
+import '../models/event_model.dart';
+import 'dart:convert';
 
 class CalendarWidget extends StatelessWidget {
   final DateTime selectedDate;
   final CalendarFormat calendarFormat;
   final void Function(DateTime, DateTime) onDaySelected;
   final void Function(CalendarFormat) onFormatChanged;
-  final Map<DateTime, List<Map<String, dynamic>>> events;
-  final List<Map<String, dynamic>> eventDetails;
+  final Map<DateTime, List<Event>> events;
+  final List<Event> eventDetails;
 
   const CalendarWidget({
-    Key? key,
+    super.key,
     required this.selectedDate,
     required this.calendarFormat,
     required this.onDaySelected,
     required this.onFormatChanged,
     required this.events,
     required this.eventDetails,
-  }) : super(key: key);
+  });
 
   static DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
-  // Helper function to get month name
-  String _getMonthName(int month) {
-    switch (month) {
-      case 1:
-        return 'January';
-      case 2:
-        return 'February';
-      case 3:
-        return 'March';
-      case 4:
-        return 'April';
-      case 5:
-        return 'May';
-      case 6:
-        return 'June';
-      case 7:
-        return 'July';
-      case 8:
-        return 'August';
-      case 9:
-        return 'September';
-      case 10:
-        return 'October';
-      case 11:
-        return 'November';
-      case 12:
-        return 'December';
-      default:
-        return '';
+  DateTime parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return DateTime.now();
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print("Error parsing date: $dateString - $e");
+      return DateTime.now();
     }
+  }
+
+  String parseColor(String? color) {
+    if (color == null || color.isEmpty) return "0xFF2196F3"; // Default to blue
+    return "0xFF${color.replaceAll('#', '')}"; // Remove '#' if present
+  }
+
+  String decodeUtf8(String text) {
+    return utf8.decode(text.runes.toList());
+  }
+
+  String _getMonthName(DateTime date) {
+    // Use the DateFormat class to get the month name from the selected date
+    return DateFormat('MMMM')
+        .format(date); // Formats month as a full name like "January"
+  }
+
+  String _getKhmerDayName(DateTime date) {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    return days[date.weekday - 1];
+  }
+
+  bool _isWeekend(DateTime date) {
+    return date.weekday == 6 || date.weekday == 7; // Saturday or Sunday
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TableCalendar(
-          focusedDay: selectedDate,
-          firstDay: DateTime(2020),
-          lastDay: DateTime(2030),
-          calendarFormat: calendarFormat,
-          eventLoader: (date) {
-            return events.containsKey(_normalizeDate(date))
-                ? events[_normalizeDate(date)]!
-                : [];
-          },
-          selectedDayPredicate: (day) => isSameDay(day, selectedDate),
-          onDaySelected: onDaySelected,
-          onFormatChanged: onFormatChanged,
-          headerStyle: HeaderStyle(
-            titleTextStyle: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
-            formatButtonVisible: false, // Hide the format button
-          ),
-          calendarBuilders: CalendarBuilders(
-            headerTitleBuilder: (context, date) {
-              // Custom header title to show only the month and year
-              return Text(
-                '${_getMonthName(date.month)} ${date.year}',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              );
-            },
-            markerBuilder: (context, date, events) {
-              if (events.isNotEmpty) {
-                // Limit the number of events to 3
-                final limitedEvents = events.take(3).toList();
-                final hasMoreEvents =
-                    events.length > 3; // Check if there are more than 3 events
-
-                return Positioned(
-                  bottom:
-                      1.0, // Adjust this value to position the markers below the date box
-                  right: 0.0,
-                  left: 0.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .center, // Center the points and plus sign
-                    crossAxisAlignment: CrossAxisAlignment
-                        .center, // Align children vertically in the middle
-                    children: [
-                      // Display up to 3 points
-                      ...limitedEvents.map((event) {
-                        final color =
-                            (event as Map<String, dynamic>)["color"] ??
-                                Colors.grey;
-                        return Container(
-                          width: 6.0,
-                          height: 6.0,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal:
-                                1.0, // Horizontal spacing between points
-                          ),
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                          ),
-                        );
-                      }).toList(),
-
-                      // Add a "+" sign if there are more than 3 events
-                      if (hasMoreEvents)
-                        Container(
-                          width: 12.0, // Increase the width
-                          height: 14.0, // Increase the height
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 1.0, // Horizontal spacing
-                          ),
-                          alignment: Alignment
-                              .center, // Center the plus sign vertically
-                          child: Text(
-                            "+",
-                            style: TextStyle(
-                              fontSize: 10.0, // Increase the font size
-                              color: const Color.fromARGB(
-                                  255, 0, 0, 0), // Text color
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                    ],
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_getMonthName(selectedDate)} ${selectedDate.year}', // Use updated _getMonthName
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
-                );
-              }
-              return SizedBox.shrink();
-            },
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today, color: Colors.blue),
+                    onPressed: () async {
+                      DateTime? newDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2030),
+                      );
+                      if (newDate != null && newDate != selectedDate) {
+                        onDaySelected(
+                            newDate, newDate); // Update the selected date
+                      }
+                    },
+                  ),
+                ],
+              ),
+              TableCalendar(
+                focusedDay: selectedDate,
+                firstDay: DateTime(2020),
+                lastDay: DateTime(2030),
+                calendarFormat: calendarFormat,
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                eventLoader: (date) {
+                  return events[_normalizeDate(date)] ?? [];
+                },
+                selectedDayPredicate: (day) => isSameDay(day, selectedDate),
+                onDaySelected: onDaySelected,
+                onFormatChanged: onFormatChanged,
+                locale: 'en_GB',
+                headerStyle: const HeaderStyle(
+                  titleTextStyle: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                  formatButtonVisible: false,
+                ),
+                daysOfWeekStyle: const DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                  ),
+                  weekendStyle: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                  ),
+                ),
+                calendarBuilders: CalendarBuilders(
+                  headerTitleBuilder: (context, date) {
+                    return Text(
+                      '${_getMonthName(date)} ${date.year}', // Use updated _getMonthName here too
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    );
+                  },
+                  dowBuilder: (context, day) {
+                    final khmerDayName = _getKhmerDayName(day);
+                    return Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        khmerDayName,
+                        style: TextStyle(
+                          color: _isWeekend(day) ? Colors.red : Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    );
+                  },
+                  markerBuilder: (context, date, eventList) {
+                    if (eventList.isNotEmpty) {
+                      final limitedEvents = eventList.take(3).toList();
+                      final hasMoreEvents = eventList.length > 3;
+
+                      return Positioned(
+                        bottom: 1.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ...limitedEvents.map((event) {
+                              final eventObj = event as Event;
+                              final color = parseColor(eventObj.color);
+                              return Container(
+                                width: 6.0,
+                                height: 6.0,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 1.0),
+                                decoration: BoxDecoration(
+                                  color: Color(int.parse(color)),
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+                            }),
+                            if (hasMoreEvents)
+                              const Text(
+                                "+",
+                                style: TextStyle(
+                                  fontSize: 10.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),
@@ -177,103 +217,175 @@ class CalendarWidget extends StatelessWidget {
                             offset: const Offset(0, 3),
                           ),
                         ],
-                        color: Colors.white, // Background color for the card
+                        color: Colors.white,
                       ),
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title with background color
                           Container(
                             decoration: BoxDecoration(
-                              color: event["color"] ??
-                                  const Color.fromARGB(
-                                      255, 0, 0, 0), // Solid color
+                              color: Color(int.parse(parseColor(event.color))),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12.0, vertical: 8.0),
                             child: Row(
                               children: [
-                                Icon(
-                                  Icons.event,
-                                  color: Colors.white,
-                                  size: 20.0,
-                                ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  event["title"],
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                Flexible(
+                                  child: Text(
+                                    event.title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 12),
-                          // Description
-                          Text(
-                            event["description"],
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black, // Black text color
-                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                children: [
+                                  Icon(Icons.description_outlined,
+                                      color: Colors.black, size: 20.0),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Description:",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: event.type,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  softWrap: true,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )
+                            ],
                           ),
                           const SizedBox(height: 12),
-                          // Location
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.black, // Black icon color
-                                size: 16.0,
+                              Column(
+                                children: [
+                                  Icon(Icons.location_on_outlined,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                      size: 20.0),
+                                ],
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                "ទីតាំង៖ ${event["location"]}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black, // Black text color
+                              Expanded(
+                                child: RichText(
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Location: ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: event.place,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
-                          // Time
                           Row(
                             children: [
-                              Icon(
-                                Icons.access_time,
-                                color: Colors.black, // Black icon color
-                                size: 16.0,
-                              ),
+                              Icon(Icons.access_time,
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                  size: 20.0),
                               const SizedBox(width: 8),
-                              Text(
-                                "ម៉ោង៖ ${event["time"]}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black, // Black text color
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Time: ",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                    TextSpan(
+                                      text: isSameDay(
+                                              event.startTime, selectedDate)
+                                          ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
+                                          : "${DateFormat("yyyy-MM-dd hh:mm a").format(event.startTime)} - ${DateFormat("yyyy-MM-dd hh:mm a").format(event.endTime)}",
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
-                          // Participants
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.people,
-                                color: Colors.black, // Black icon color
-                                size: 16.0,
-                              ),
+                              Icon(Icons.people_outline,
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                  size: 20.0),
                               const SizedBox(width: 8),
-                              Text(
-                                "អ្នកចូលរួម៖ ${event["participants"].join(', ')}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black, // Black text color
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Participants:\n",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: event.employees
+                                            .map((e) => e.name)
+                                            .join('\n'),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -287,12 +399,9 @@ class CalendarWidget extends StatelessWidget {
             ),
           )
         else
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              "មិនមានកិច្ជប្រជុំទេ សម្រាប់ថ្ងៃនេះ។",
-              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-            ),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text("មិនមានកិច្ចប្រជុំទេថ្ងៃនេះ។"),
           ),
       ],
     );
