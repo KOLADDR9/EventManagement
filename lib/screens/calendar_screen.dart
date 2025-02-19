@@ -52,19 +52,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF083E68), // #083E68
+                Color(0xFF107BCE), // #107BCE
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ), // Fixed background color
+        elevation: 0.0, // No shadow when scrolling
         title: Text(
-          'CIB event management',
+          'CIB Event Management',
           style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
-            fontFamily:
-                'YourCustomFont', // Replace with your custom font family
-            color: const Color.fromARGB(255, 0, 33, 105),
+            fontFamily: 'YourCustomFont', // Replace with your custom font
+            color: Colors.white, // Ensure text remains visible
           ),
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(10.0),
             child: PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'logout') {
@@ -76,15 +88,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
               },
               itemBuilder: (BuildContext context) {
                 return [
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                     value: 'logout',
                     child: Text('Logout'),
                   ),
                 ];
               },
-              child: CircleAvatar(
-                backgroundColor: Colors.blue,
-                child: Icon(Icons.person, color: Colors.white),
+              child: const CircleAvatar(
+                backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                child: Icon(Icons.person, color: Color(0xFFFBA518)),
               ),
             ),
           ),
