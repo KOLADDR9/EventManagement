@@ -100,7 +100,8 @@ class CalendarWidget extends StatelessWidget {
                 focusedDay: selectedDate,
                 firstDay: DateTime(2020),
                 lastDay: DateTime(2030),
-                calendarFormat: calendarFormat,
+                calendarFormat:
+                    CalendarFormat.month, // Ensure month view for scrolling
                 startingDayOfWeek: StartingDayOfWeek.monday,
                 eventLoader: (date) {
                   return events[_normalizeDate(date)] ?? [];
@@ -109,14 +110,7 @@ class CalendarWidget extends StatelessWidget {
                 onDaySelected: onDaySelected,
                 onFormatChanged: onFormatChanged,
                 locale: 'en_GB',
-                headerStyle: const HeaderStyle(
-                  titleTextStyle: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                  formatButtonVisible: false,
-                ),
+                headerVisible: false, // Hide the header completely
                 daysOfWeekStyle: const DaysOfWeekStyle(
                   weekdayStyle: TextStyle(
                     color: Colors.black,
@@ -129,17 +123,8 @@ class CalendarWidget extends StatelessWidget {
                     fontSize: 14.0,
                   ),
                 ),
+                pageAnimationEnabled: true, // Enable smooth scrolling
                 calendarBuilders: CalendarBuilders(
-                  headerTitleBuilder: (context, date) {
-                    return Text(
-                      '${_getMonthName(date)} ${date.year}', // Use updated _getMonthName here too
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    );
-                  },
                   dowBuilder: (context, day) {
                     final khmerDayName = _getKhmerDayName(day);
                     return Container(
