@@ -39,6 +39,7 @@ dependencies:
   dio: ^5.7.0
   flutter_dotenv: ^5.2.1
   intl: ^0.20.0 # or whichever latest version you are using
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:
