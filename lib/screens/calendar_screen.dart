@@ -4,6 +4,7 @@ import 'package:event_management_app/services/api_service.dart';
 import 'package:event_management_app/models/event_model.dart';
 import 'package:event_management_app/widgets/calendar_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:event_management_app/services/auth_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -52,40 +53,105 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF083E68), // #083E68
+                Color(0xFF107BCE), // #107BCE
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ), // Fixed background color
+        elevation: 0.0, // No shadow when scrolling
         title: Text(
-          'CIB event management',
+          'CIB Event Management',
           style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
-            fontFamily:
-                'YourCustomFont', // Replace with your custom font family
-            color: const Color.fromARGB(255, 0, 33, 105),
+            fontFamily: 'YourCustomFont', // Replace with your custom font
+            color: Colors.white, // Ensure text remains visible
           ),
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(10.0),
             child: PopupMenuButton<String>(
-              onSelected: (value) {
+              onSelected: (value) async {
                 if (value == 'logout') {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                    (Route<dynamic> route) => false,
+                  bool? confirmLogout = await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('Confirm Logout'),
+                          ],
+                        ),
+                        content: Text(
+                          'Are you sure you want to log out?',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 215, 212),
+                            ),
+                            child: Text('Logout'),
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
+
+                  if (confirmLogout == true) {
+                    await AuthService.removeToken(); // Add this line
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
                 }
               },
               itemBuilder: (BuildContext context) {
                 return [
-                  PopupMenuItem<String>(
+                  const PopupMenuItem<String>(
                     value: 'logout',
-                    child: Text('Logout'),
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Logout'),
+                      ],
+                    ),
                   ),
                 ];
               },
-              child: CircleAvatar(
-                backgroundColor: Colors.blue,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
+              offset: Offset(0, 40),
+              child: const CircleAvatar(
+                backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                child: Icon(Icons.person, color: Color(0xFFFBA518)),
+              ), // Adjust the vertical offset as needed
             ),
           ),
         ],
@@ -93,32 +159,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: FutureBuilder<Map<DateTime, List<Event>>>(
         future: _eventsFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No events available'));
-          } else {
-            final events = snapshot.data!;
-            final eventDetails = _getEventDetailsForSelectedDate(events);
-            return CalendarWidget(
-              selectedDate: _selectedDate,
-              calendarFormat: _calendarFormat,
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDate = selectedDay;
-                });
-              },
-              onFormatChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              },
-              events: events,
-              eventDetails: eventDetails,
-            );
-          }
+          final events = snapshot.data ?? {};
+          final eventDetails = _getEventDetailsForSelectedDate(events);
+          return CalendarWidget(
+            selectedDate: _selectedDate,
+            calendarFormat: _calendarFormat,
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDate = selectedDay;
+              });
+            },
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            events: events,
+            eventDetails: eventDetails,
+          );
         },
       ),
     );

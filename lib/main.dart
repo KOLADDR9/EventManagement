@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/calendar_screen.dart';
 import 'widgets/bottom_navigation.dart';
@@ -35,6 +34,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Disable DEBUG banner
       title: 'Event Calendar',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: isLoggedIn ? const MainScreen() : LoginPage(),
