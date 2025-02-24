@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Add this import at the top
 import 'package:intl/intl.dart'; // Import the package for date formatting
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
@@ -62,6 +63,21 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Add this at the start of build method to force portrait on small screens
+    if (MediaQuery.of(context).size.width < 600) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth > 1024) {
@@ -92,7 +108,7 @@ class CalendarWidget extends StatelessWidget {
                         child: TableCalendar(
                           focusedDay: selectedDate,
                           firstDay: DateTime(2020),
-                          lastDay: DateTime(2030),
+                          lastDay: DateTime(2050),
                           calendarFormat: calendarFormat,
                           startingDayOfWeek: StartingDayOfWeek.monday,
                           eventLoader: (date) {
@@ -113,9 +129,24 @@ class CalendarWidget extends StatelessWidget {
                               Icons.chevron_left,
                               color: const Color.fromARGB(255, 255, 255, 255),
                             ),
-                            rightChevronIcon: Icon(
-                              Icons.chevron_right,
-                              color: const Color.fromARGB(255, 255, 255, 255),
+                            rightChevronIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.chevron_right,
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.today, color: Colors.white),
+                                  onPressed: () => onDaySelected(
+                                      DateTime.now(), DateTime.now()),
+                                  tooltip: 'Today',
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  iconSize: 20,
+                                ),
+                              ],
                             ),
                             headerPadding: EdgeInsets.symmetric(vertical: 8.0),
                             titleTextStyle: TextStyle(
@@ -137,6 +168,9 @@ class CalendarWidget extends StatelessWidget {
                                 topRight: Radius.circular(12),
                               ),
                             ),
+                            rightChevronMargin: EdgeInsets.only(right: 12),
+                            leftChevronMargin: EdgeInsets.only(left: 12),
+                            headerMargin: EdgeInsets.only(bottom: 8),
                           ),
                           daysOfWeekHeight: 60.0,
                           calendarStyle: CalendarStyle(
@@ -527,7 +561,7 @@ class CalendarWidget extends StatelessWidget {
                         child: TableCalendar(
                           focusedDay: selectedDate,
                           firstDay: DateTime(2020),
-                          lastDay: DateTime(2030),
+                          lastDay: DateTime(2050),
                           calendarFormat: calendarFormat,
                           startingDayOfWeek: StartingDayOfWeek.monday,
                           eventLoader: (date) {
@@ -548,9 +582,24 @@ class CalendarWidget extends StatelessWidget {
                               Icons.chevron_left,
                               color: const Color.fromARGB(255, 255, 255, 255),
                             ),
-                            rightChevronIcon: Icon(
-                              Icons.chevron_right,
-                              color: const Color.fromARGB(255, 255, 255, 255),
+                            rightChevronIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.chevron_right,
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.today, color: Colors.white),
+                                  onPressed: () => onDaySelected(
+                                      DateTime.now(), DateTime.now()),
+                                  tooltip: 'Today',
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  iconSize: 20,
+                                ),
+                              ],
                             ),
                             headerPadding: EdgeInsets.symmetric(vertical: 8.0),
                             titleTextStyle: TextStyle(
@@ -572,7 +621,11 @@ class CalendarWidget extends StatelessWidget {
                                 topRight: Radius.circular(12),
                               ),
                             ),
+                            rightChevronMargin: EdgeInsets.only(right: 12),
+                            leftChevronMargin: EdgeInsets.only(left: 12),
+                            headerMargin: EdgeInsets.only(bottom: 8),
                           ),
+
                           daysOfWeekHeight: 60.0,
                           calendarStyle: CalendarStyle(
                             defaultTextStyle: TextStyle(
@@ -635,8 +688,8 @@ class CalendarWidget extends StatelessWidget {
                                   children: [
                                     Spacer(), // Pushes the markers to the bottom
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center, // Center alignment for event markers
                                       children: [
                                         ...limitedEvents.map((event) {
                                           final eventObj = event as Event;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:event_management_app/screens/calendar_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:event_management_app/main.dart'; // Import MainScreen
 import 'package:event_management_app/services/api_service.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,6 +12,39 @@ class _LoginPageState extends State<LoginPage> {
   final ApiService apiService = ApiService();
   final List<TextEditingController> _controllers =
       List.generate(6, (index) => TextEditingController());
+
+  @override
+  void initState() {
+    super.initState();
+    // Lock screen to portrait mode only on mobile devices
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (MediaQuery.of(context).size.shortestSide < 600) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+
+    // Reset orientation only if on phone
+    if (MediaQuery.of(context).size.shortestSide < 600) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+
+    super.dispose();
+  }
 
   Future<void> _handleLogin(BuildContext context) async {
     String code = _controllers.map((c) => c.text).join();
@@ -41,23 +74,20 @@ class _LoginPageState extends State<LoginPage> {
       if (success == true) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CalendarScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {
-        // Show error message and clear input
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Invalid code. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
-        // Clear input fields
         for (var controller in _controllers) {
           controller.clear();
         }
       }
     } catch (e) {
-      // Hide loading indicator if showing
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
@@ -68,18 +98,10 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.red,
         ),
       );
-      // Clear input fields
       for (var controller in _controllers) {
         controller.clear();
       }
     }
-  }
-
-  Future<String> _getTokenFromApi(String code) async {
-    // Simulate an API call to get the token
-    // Replace this with your actual API logic
-    await Future.delayed(Duration(seconds: 2));
-    return 'mock_token_for_$code';
   }
 
   @override
@@ -89,10 +111,7 @@ class _LoginPageState extends State<LoginPage> {
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF083E68), // #083E68
-              Color(0xFF107BCE), // #107BCE
-            ],
+            colors: [Color(0xFF083E68), Color(0xFF107BCE)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -168,7 +187,6 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       });
 
-                      // Auto-submit when all fields are filled
                       if (_controllers.every((c) => c.text.isNotEmpty)) {
                         _handleLogin(context);
                       }

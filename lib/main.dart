@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/calendar_screen.dart';
-import 'widgets/bottom_navigation.dart';
-import 'screens/meeting_screen.dart';
+import 'screens/profile_screen.dart';
 import 'screens/login.dart';
 
 Future<void> main() async {
@@ -29,15 +29,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isLoggedIn = false; // Simulate authentication
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Disable DEBUG banner
+      debugShowCheckedModeBanner: false,
       title: 'Event Calendar',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: isLoggedIn ? const MainScreen() : LoginPage(),
+      home: _isLoggedIn ? const MainScreen() : LoginPage(),
     );
   }
 }
@@ -50,15 +63,16 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1; // Default to Calendar tab
+  int _selectedIndex = 0;
+
   final List<Widget> _pages = [
-    const MeetingScreen(),
     const CalendarScreen(),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex = index; // Switch between Calendar and Profile
     });
   }
 
@@ -70,6 +84,37 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
+    );
+  }
+}
+
+class BottomNav extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onTap;
+
+  const BottomNav({
+    Key? key,
+    required this.currentIndex,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      selectedItemColor: Colors.blue,
+      unselectedItemColor: Colors.grey,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.calendar_today),
+          label: 'Calendar',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Profile',
+        ),
+      ],
     );
   }
 }
