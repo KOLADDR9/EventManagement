@@ -1,10 +1,13 @@
-import 'package:shared_preferences/shared_preferences.dart';
+// TODO: Add flutter_secure_storage to pubspec.yaml dependencies first:
+// flutter_secure_storage: ^9.0.0
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _baseUrl = 'https://meeting-stage.cib-cdc.com/api';
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   // Login method
   static Future<bool> login(String code) async {
@@ -39,16 +42,14 @@ class AuthService {
     }
   }
 
-  // Save token
+  // Save token securely
   static Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    await _secureStorage.write(key: _tokenKey, value: token);
   }
 
-  // Get token
+  // Get token securely
   static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+    return await _secureStorage.read(key: _tokenKey);
   }
 
   // Check if token exists
@@ -59,7 +60,8 @@ class AuthService {
 
   // Remove token (for logout)
   static Future<void> removeToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
+    await _secureStorage.delete(key: _tokenKey);
   }
+
+  logout() {}
 }
