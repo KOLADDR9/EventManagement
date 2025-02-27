@@ -106,6 +106,6 @@ flutter:
   # https://flutter.dev/to/asset-from-package
   # To add custom fonts to your application, add a fonts section here,
   fonts:
-    - family: KantumruyPro
+    - family: KantumruyPro-Regular
       fonts:
         - asset: assets/fonts/KantumruyPro-Regular.ttf

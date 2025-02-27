@@ -4,6 +4,7 @@ import 'package:intl/intl.dart'; // Import the package for date formatting
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
 import 'dart:convert';
+import '/theme/font_fm.dart';
 
 class CalendarWidget extends StatelessWidget {
   final DateTime selectedDate;
@@ -363,13 +364,15 @@ class CalendarWidget extends StatelessWidget {
                                             Flexible(
                                               child: Text(
                                                 event.title,
-                                                style: const TextStyle(
-                                                  fontFamily:
-                                                      'KantumruyPro-Regular',
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.white,
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 16,
+                                                      color: Colors.black,
+                                                    ),
                                                 softWrap: true,
                                                 overflow: TextOverflow.visible,
                                               ),
@@ -399,21 +402,28 @@ class CalendarWidget extends StatelessWidget {
                                                   children: [
                                                     TextSpan(
                                                       text: "ទីតាំង: ",
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            'KantumruyPro-Regular',
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
                                                     ),
                                                     TextSpan(
                                                       text: event.place,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
                                                     ),
                                                   ],
                                                 ),
@@ -439,15 +449,15 @@ class CalendarWidget extends StatelessWidget {
                                                 children: [
                                                   TextSpan(
                                                     text: "ពេលវេលា: ",
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            'KantumruyPro-Regular',
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: const Color
-                                                            .fromARGB(
-                                                            255, 179, 25, 25)),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                   TextSpan(
                                                     text: isSameDay(
@@ -455,9 +465,15 @@ class CalendarWidget extends StatelessWidget {
                                                             selectedDate)
                                                         ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
                                                         : "${DateFormat("yyyy-MM-dd hh:mm a").format(event.startTime)} - ${DateFormat("yyyy-MM-dd hh:mm a").format(event.endTime)}",
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 16,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -485,23 +501,31 @@ class CalendarWidget extends StatelessWidget {
                                                   children: [
                                                     TextSpan(
                                                       text: "អ្នកចូលរួម:\n",
-                                                      style: TextStyle(
-                                                        fontFamily:
-                                                            'KantumruyPro-Regular',
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
                                                     ),
                                                     TextSpan(
                                                       text: event.employees
                                                           .map((e) => e.name)
                                                           .join('\n'),
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
                                                     ),
                                                   ],
                                                 ),
@@ -533,12 +557,14 @@ class CalendarWidget extends StatelessWidget {
                             padding: EdgeInsets.all(12.0),
                             child: Text(
                               "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
-                              style: TextStyle(
-                                fontFamily: 'KantumruyPro-Regular',
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.normal,
-                                color: const Color.fromARGB(255, 255, 255, 255),
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -809,11 +835,15 @@ class CalendarWidget extends StatelessWidget {
                                           Flexible(
                                             child: Text(
                                               event.title,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.white,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                  ),
                                               softWrap: true,
                                               overflow: TextOverflow.visible,
                                             ),
@@ -843,21 +873,27 @@ class CalendarWidget extends StatelessWidget {
                                                 children: [
                                                   TextSpan(
                                                     text: "ទីតាំង: ",
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          'KantumruyPro-Regular',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                   TextSpan(
                                                     text: event.place,
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 15,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -883,13 +919,15 @@ class CalendarWidget extends StatelessWidget {
                                               children: [
                                                 TextSpan(
                                                   text: "ពេលវេលា: ",
-                                                  style: TextStyle(
-                                                      fontFamily:
-                                                          'KantumruyPro-Regular',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.black),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                      ),
                                                 ),
                                                 TextSpan(
                                                   text: isSameDay(
@@ -897,9 +935,15 @@ class CalendarWidget extends StatelessWidget {
                                                           selectedDate)
                                                       ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
                                                       : "${DateFormat("yyyy-MM-dd hh:mm a").format(event.startTime)} - ${DateFormat("yyyy-MM-dd hh:mm a").format(event.endTime)}",
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                      ),
                                                 ),
                                               ],
                                             ),
@@ -927,23 +971,29 @@ class CalendarWidget extends StatelessWidget {
                                                 children: [
                                                   TextSpan(
                                                     text: "អ្នកចូលរួម:\n",
-                                                    style: TextStyle(
-                                                      fontFamily:
-                                                          'KantumruyPro-Regular',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                   TextSpan(
                                                     text: event.employees
                                                         .map((e) => e.name)
                                                         .join('\n'),
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 15,
+                                                          color: Colors.black,
+                                                        ),
                                                   ),
                                                 ],
                                               ),
@@ -959,14 +1009,18 @@ class CalendarWidget extends StatelessWidget {
                           }).toList(),
                         )
                       else
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Text(
                             "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
-                            style: TextStyle(
-                              fontFamily: 'KantumruyPro-Regular',
-                              fontSize: 16.0, // Custom font size
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
                           ),
                         ),
                     ],
