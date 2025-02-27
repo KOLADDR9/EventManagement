@@ -20,6 +20,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ^3.6.0
+  
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -29,6 +30,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
   http: ^1.3.0
 
@@ -41,8 +44,14 @@ dependencies:
   intl: ^0.20.0 # or whichever latest version you are using
   shared_preferences: ^2.5.2
   flutter_secure_storage: ^9.2.4
+  flutter_launcher_icons: ^0.14.3
+  universal_html: ^2.2.4
+
+  
+  
 
 dev_dependencies:
+
   flutter_test:
     sdk: flutter
 
@@ -52,6 +61,27 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+flutter_icons:
+  # The base image for both Android and iOS icons.
+  image_path: "assets/img/app_logo_CIB.png"
+
+  # Create launcher icons for both Android and iOS.
+  android: true
+  ios: true
+
+  # Adaptive icon background (should be a simple color or solid background)
+  # Can be a transparent or solid color. If it's solid, consider adding a background like #FFFFFF.
+  adaptive_icon_background: "assets/img/app_logo_CIB.png"  # A solid color background or a subtle gradient.
+  
+  # Adaptive icon foreground (logo should be centered and have transparency).
+  # Ensure the logo is centered in a square image with transparency.
+  adaptive_icon_foreground: "assets/img/app_logo_CIB.png"  # The logo image (transparent background).
+
+  # For Android devices, use the launcher icon as the fallback image
+  android_icon: "launcher_icon"
+
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -74,23 +104,8 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
-
   # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: KantumruyPro
+      fonts:
+        - asset: assets/fonts/KantumruyPro-Regular.ttf

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:event_management_app/services/auth_service.dart';
 import 'package:event_management_app/screens/login.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,7 +12,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  int _currentIndex = 1; // Set to 1 for Profile tab
+  Future<void> _clearLocalStorage() async {
+    if (kIsWeb) {
+      html.window.localStorage.clear();
+    }
+  }
 
   Future<void> _handleLogout() async {
     final bool? confirmLogout = await showDialog<bool>(
@@ -18,24 +24,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Row(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Row(
             children: [
-              Icon(Icons.logout, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Confirm Logout',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Icon(Icons.logout, color: Colors.red.shade600),
+              const SizedBox(width: 8),
+              const Text(
+                'Confirm Logout',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           content: const Text(
             'Are you sure you want to log out?',
-            style: TextStyle(fontSize: 16.0, color: Colors.black54),
+            style: TextStyle(
+              fontFamily: 'KantumruyPro-Regular',
+              fontSize: 16.0,
+              color: Colors.black54,
+            ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel',
-                  style: TextStyle(color: Colors.grey, fontSize: 15)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'KantumruyPro-Regular',
+                  color: Colors.grey,
+                  fontSize: 15,
+                ),
+              ),
               onPressed: () => Navigator.of(context).pop(false),
             ),
             ElevatedButton(
@@ -43,13 +64,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.red.shade600,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
-              child: const Text('Logout',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontFamily: 'KantumruyPro-Regular',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onPressed: () async {
+                await _clearLocalStorage();
+                Navigator.of(context).pop(true);
+              },
             ),
           ],
         );
@@ -62,7 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (!mounted) return;
 
         await Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(
+            builder: (context) => LoginPage(),
+          ),
         );
       } catch (e) {
         if (!mounted) return;
@@ -85,57 +120,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF083E68),
-              Color(0xFF107BCE),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width *
-                  0.5, // 50% of screen width
-              height: MediaQuery.of(context).size.width *
-                  0.5, // Keeping aspect ratio square
-              child: Image.asset(
-                'assets/img/logo.png',
-                fit: BoxFit.contain,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Adjust image and button sizes based on screen width
+          final double imageSize = constraints.maxWidth < 600
+              ? constraints.maxWidth * 0.8 // Bigger logo for small screens
+              : constraints.maxWidth * 0.3; // Smaller logo for larger screens
+
+          final double buttonWidth = constraints.maxWidth < 600
+              ? constraints.maxWidth * 0.6 // Smaller button for small screens
+              : constraints.maxWidth * 0.3; // Bigger button for larger screens
+
+          return Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF083E68), Color(0xFF107BCE)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Logo Image
+                    SizedBox(
+                      width: imageSize,
+                      height: imageSize,
+                      child: Image.asset(
+                        'assets/img/logo.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
 
-            // Logout Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _handleLogout,
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade600,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
+                    // Logout Button
+                    SizedBox(
+                      width: buttonWidth,
+                      child: ElevatedButton.icon(
+                        onPressed: _handleLogout,
+                        icon: const Icon(
+                          Icons.logout,
+                          color: Color(0xFF083E68),
+                        ),
+                        label: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontFamily: 'KantumruyPro-Regular',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF083E68),
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
