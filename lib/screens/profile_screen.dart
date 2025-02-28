@@ -11,7 +11,51 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with AutomaticKeepAliveClientMixin {
+  Map<String, dynamic>? _userData;
+  bool _isLoading = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    try {
+      // Simulate network delay based on connection
+      final minDelay = Duration(milliseconds: 800); // Minimum delay for UX
+      final start = DateTime.now();
+
+      // Replace with your actual API call
+      // final userData = await ApiService().getUserProfile();
+
+      // Calculate remaining delay after API call
+      final elapsed = DateTime.now().difference(start);
+      if (elapsed < minDelay) {
+        await Future.delayed(minDelay - elapsed);
+      }
+
+      // setState(() => _userData = userData);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load user data: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   Future<void> _clearLocalStorage() async {
     if (kIsWeb) {
       html.window.localStorage.clear();
@@ -119,78 +163,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Adjust image and button sizes based on screen width
-          final double imageSize = constraints.maxWidth < 600
-              ? constraints.maxWidth * 0.8 // Bigger logo for small screens
-              : constraints.maxWidth * 0.3; // Smaller logo for larger screens
+      body: RefreshIndicator(
+        onRefresh: _loadUserData,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double imageSize = constraints.maxWidth < 600
+                ? constraints.maxWidth * 0.8
+                : constraints.maxWidth * 0.3;
 
-          final double buttonWidth = constraints.maxWidth < 600
-              ? constraints.maxWidth * 0.6 // Smaller button for small screens
-              : constraints.maxWidth * 0.3; // Bigger button for larger screens
+            final double buttonWidth = constraints.maxWidth < 600
+                ? constraints.maxWidth * 0.6
+                : constraints.maxWidth * 0.3;
 
-          return Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF083E68), Color(0xFF107BCE)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Logo Image
-                    SizedBox(
-                      width: imageSize,
-                      height: imageSize,
-                      child: Image.asset(
-                        'assets/img/logo.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-
-                    // Logout Button
-                    SizedBox(
-                      width: buttonWidth,
-                      child: ElevatedButton.icon(
-                        onPressed: _handleLogout,
-                        icon: const Icon(
-                          Icons.logout,
-                          color: Color(0xFF083E68),
-                        ),
-                        label: const Text(
-                          'Logout',
-                          style: TextStyle(
-                            fontFamily: 'KantumruyPro-Regular',
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF083E68),
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          elevation: 5,
-                        ),
-                      ),
-                    ),
-                  ],
+            return Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF083E68), Color(0xFF107BCE)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
-            ),
-          );
-        },
+              child: Center(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (_isLoading)
+                        const CircularProgressIndicator(color: Colors.white)
+                      else ...[
+                        SizedBox(
+                          width: imageSize,
+                          height: imageSize,
+                          child: Image.asset(
+                            'assets/img/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: buttonWidth,
+                          child: ElevatedButton.icon(
+                            onPressed: _handleLogout,
+                            icon: const Icon(
+                              Icons.logout,
+                              color: Color(0xFF083E68),
+                            ),
+                            label: const Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontFamily: 'KantumruyPro-Regular',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF083E68),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              elevation: 5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
