@@ -1,10 +1,15 @@
-import 'package:shared_preferences/shared_preferences.dart';
+// TODO: Add flutter_secure_storage to pubspec.yaml dependencies first:
+// flutter_secure_storage: ^9.0.0
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _baseUrl = 'https://meeting-stage.cib-cdc.com/api';
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   // Login method
   static Future<bool> login(String code) async {
@@ -39,27 +44,42 @@ class AuthService {
     }
   }
 
-  // Save token
+  // Save token securely
   static Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    if (kIsWeb) {
+      try {
+        html.window.localStorage[_tokenKey] = token;
+        print('🔑 Token saved to localStorage: $token');
+      } catch (e) {
+        print('🚨 Error saving to localStorage: $e');
+      }
+    } else {
+      await _secureStorage.write(key: _tokenKey, value: token);
+    }
   }
 
-  // Get token
   static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+    if (kIsWeb) {
+      try {
+        return html.window.localStorage[_tokenKey];
+      } catch (e) {
+        print('🚨 Error reading from localStorage: $e');
+        return null;
+      }
+    } else {
+      return await _secureStorage.read(key: _tokenKey);
+    }
   }
 
-  // Check if token exists
-  static Future<bool> hasToken() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
-  }
-
-  // Remove token (for logout)
   static Future<void> removeToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
+    if (kIsWeb) {
+      try {
+        html.window.localStorage.remove(_tokenKey);
+      } catch (e) {
+        print('🚨 Error removing from localStorage: $e');
+      }
+    } else {
+      await _secureStorage.delete(key: _tokenKey);
+    }
   }
 }
