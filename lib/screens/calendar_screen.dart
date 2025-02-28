@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:event_management_app/services/api_service.dart';
 import 'package:event_management_app/models/event_model.dart';
 import 'package:event_management_app/widgets/calendar_widget.dart';
-import 'package:event_management_app/screens/profile_screen.dart'; // Import ProfileScreen
+import 'package:event_management_app/screens/profile_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -12,11 +12,14 @@ class CalendarScreen extends StatefulWidget {
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
-class _CalendarScreenState extends State<CalendarScreen> {
-  int _currentIndex = 0; // Track selected tab
+class _CalendarScreenState extends State<CalendarScreen>
+    with AutomaticKeepAliveClientMixin {
   late Future<Map<DateTime, List<Event>>> _eventsFuture;
   DateTime _selectedDate = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -49,25 +52,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return events[_normalizeDate(_selectedDate)] ?? [];
   }
 
-  void _onItemTapped(int index) {
-    if (index == 1) {
-      // Navigate to ProfileScreen when clicking Profile tab
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
-      );
-    } else {
-      setState(() {
-        _currentIndex = 0; // Stay on CalendarScreen
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required by AutomaticKeepAliveClientMixin
+
     return Scaffold(
       body: SafeArea(
-        // Ensures padding for status bar
         child: FutureBuilder<Map<DateTime, List<Event>>>(
           future: _eventsFuture,
           builder: (context, snapshot) {
