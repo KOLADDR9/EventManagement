@@ -535,32 +535,18 @@ class CalendarWidget extends StatelessWidget {
                             }).toList(),
                           ))
                       : Padding(
-                          padding: const EdgeInsets.all(0.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Color(0xFF2196F3), // Light grey background
-                              borderRadius: BorderRadius.circular(8.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4.0,
-                                  offset: Offset(0, 2),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 18,
+                                  color: Colors.black,
                                 ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(12.0),
-                            child: Text(
-                              "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                 ),
