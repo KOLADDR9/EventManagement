@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:event_management_app/main.dart'; // Import MainScreen
 import 'package:event_management_app/services/api_service.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Add this import
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -69,13 +70,10 @@ class _LoginPageState extends State<LoginPage> {
 
       final success = await apiService.login(code);
 
-      Navigator.pop(context); // Hide loading indicator
+      // Hide loading indicator
+      Navigator.pop(context);
 
       if (success == true) {
-        // Store login state
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MainScreen()),
@@ -126,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
             const Text(
               'សូមបំពេញលេខកូដ ៦ ខ្ទង់',
               style: TextStyle(
+                  fontFamily: 'KantumruyPro-Regular',
                   fontSize: 22,
                   color: Colors.white,
                   fontWeight: FontWeight.bold),

@@ -364,6 +364,8 @@ class CalendarWidget extends StatelessWidget {
                                               child: Text(
                                                 event.title,
                                                 style: const TextStyle(
+                                                  fontFamily:
+                                                      'KantumruyPro-Regular',
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.normal,
                                                   color: Colors.white,
@@ -398,6 +400,8 @@ class CalendarWidget extends StatelessWidget {
                                                     TextSpan(
                                                       text: "ទីតាំង: ",
                                                       style: TextStyle(
+                                                        fontFamily:
+                                                            'KantumruyPro-Regular',
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         fontSize: 16,
@@ -436,10 +440,14 @@ class CalendarWidget extends StatelessWidget {
                                                   TextSpan(
                                                     text: "ពេលវេលា: ",
                                                     style: TextStyle(
+                                                        fontFamily:
+                                                            'KantumruyPro-Regular',
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         fontSize: 16,
-                                                        color: Colors.black),
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 179, 25, 25)),
                                                   ),
                                                   TextSpan(
                                                     text: isSameDay(
@@ -478,6 +486,8 @@ class CalendarWidget extends StatelessWidget {
                                                     TextSpan(
                                                       text: "អ្នកចូលរួម:\n",
                                                       style: TextStyle(
+                                                        fontFamily:
+                                                            'KantumruyPro-Regular',
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         fontSize: 16,
@@ -524,6 +534,7 @@ class CalendarWidget extends StatelessWidget {
                             child: Text(
                               "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
                               style: TextStyle(
+                                fontFamily: 'KantumruyPro-Regular',
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.normal,
                                 color: const Color.fromARGB(255, 255, 255, 255),
@@ -833,6 +844,8 @@ class CalendarWidget extends StatelessWidget {
                                                   TextSpan(
                                                     text: "ទីតាំង: ",
                                                     style: TextStyle(
+                                                      fontFamily:
+                                                          'KantumruyPro-Regular',
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 15,
@@ -871,6 +884,8 @@ class CalendarWidget extends StatelessWidget {
                                                 TextSpan(
                                                   text: "ពេលវេលា: ",
                                                   style: TextStyle(
+                                                      fontFamily:
+                                                          'KantumruyPro-Regular',
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 15,
@@ -913,6 +928,8 @@ class CalendarWidget extends StatelessWidget {
                                                   TextSpan(
                                                     text: "អ្នកចូលរួម:\n",
                                                     style: TextStyle(
+                                                      fontFamily:
+                                                          'KantumruyPro-Regular',
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 15,
@@ -947,6 +964,7 @@ class CalendarWidget extends StatelessWidget {
                           child: Text(
                             "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
                             style: TextStyle(
+                              fontFamily: 'KantumruyPro-Regular',
                               fontSize: 16.0, // Custom font size
                             ),
                           ),

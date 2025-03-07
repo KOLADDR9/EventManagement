@@ -3,6 +3,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/html.dart' as html;
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
@@ -44,24 +46,40 @@ class AuthService {
 
   // Save token securely
   static Future<void> saveToken(String token) async {
-    await _secureStorage.write(key: _tokenKey, value: token);
+    if (kIsWeb) {
+      try {
+        html.window.localStorage[_tokenKey] = token;
+        print('🔑 Token saved to localStorage: $token');
+      } catch (e) {
+        print('🚨 Error saving to localStorage: $e');
+      }
+    } else {
+      await _secureStorage.write(key: _tokenKey, value: token);
+    }
   }
 
-  // Get token securely
   static Future<String?> getToken() async {
-    return await _secureStorage.read(key: _tokenKey);
+    if (kIsWeb) {
+      try {
+        return html.window.localStorage[_tokenKey];
+      } catch (e) {
+        print('🚨 Error reading from localStorage: $e');
+        return null;
+      }
+    } else {
+      return await _secureStorage.read(key: _tokenKey);
+    }
   }
 
-  // Check if token exists
-  static Future<bool> hasToken() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
-  }
-
-  // Remove token (for logout)
   static Future<void> removeToken() async {
-    await _secureStorage.delete(key: _tokenKey);
+    if (kIsWeb) {
+      try {
+        html.window.localStorage.remove(_tokenKey);
+      } catch (e) {
+        print('🚨 Error removing from localStorage: $e');
+      }
+    } else {
+      await _secureStorage.delete(key: _tokenKey);
+    }
   }
-
-  logout() {}
 }
