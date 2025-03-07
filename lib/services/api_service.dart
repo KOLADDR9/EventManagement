@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/event_model.dart';
 
 class ApiService {
+  //https://meeting-stage.cib-cdc.com/api/all-meetings
   static const String baseUrl = 'https://meeting-stage.cib-cdc.com/api';
   static const String apiUrl = 'https://meeting-stage.cib-cdc.com/api/meetings';
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   // Add login method
   Future<bool> login(String otp) async {
@@ -30,9 +32,9 @@ class ApiService {
         final token = data['token'] ?? data['access_token'];
 
         if (token != null) {
-          // Store token in SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('auth_token', token.toString());
+          // Store token in Secure Storage
+          await _secureStorage.write(
+              key: 'auth_token', value: token.toString());
           return true;
         }
       }
@@ -48,9 +50,8 @@ class ApiService {
     try {
       print('🌐 Fetching events from: $apiUrl');
 
-      // Get token from SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      final authToken = prefs.getString('auth_token');
+      // Get token from Secure Storage
+      final authToken = await _secureStorage.read(key: 'auth_token');
 
       if (authToken == null) {
         throw Exception('No authentication token found');
@@ -79,14 +80,9 @@ class ApiService {
           throw Exception('Invalid API response format.');
         }
       } else if (response.statusCode == 401) {
-        if (response.statusCode == 401) {
-          // Clear the invalid token
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.remove('auth_token');
-
-          throw Exception('❌ Session expired. Please login again.');
-        }
-        throw Exception('❌ Unauthorized: Check API Token');
+        // Clear the invalid token
+        await _secureStorage.delete(key: 'auth_token');
+        throw Exception('❌ Session expired. Please login again.');
       } else if (response.statusCode == 404) {
         throw Exception('❌ Error 404: API endpoint not found');
       } else {
@@ -100,8 +96,7 @@ class ApiService {
 
   Future<bool> hasValidToken() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final authToken = prefs.getString('auth_token');
+      final authToken = await _secureStorage.read(key: 'auth_token');
 
       if (authToken == null) {
         return false;
@@ -126,8 +121,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> fetchUserProfile() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final authToken = prefs.getString('auth_token');
+      final authToken = await _secureStorage.read(key: 'auth_token');
 
       if (authToken == null) {
         throw Exception('No authentication token found');
@@ -154,4 +148,8 @@ class ApiService {
   }
 
   getUserProfile() {}
+
+  getEmployeeProfile() {}
+
+  fetchEmployee() {}
 }

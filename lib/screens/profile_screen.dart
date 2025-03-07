@@ -85,66 +85,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 40),
-          // Profile Avatar
-          Container(
-            width: 200,
-            height: 200,
-            child: Image.asset(
-              'assets/img/logo.png',
-              fit: BoxFit.contain,
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF083E68),
+              Color(0xFF107BCE),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width *
+                  0.5, // 50% of screen width
+              height: MediaQuery.of(context).size.width *
+                  0.5, // Keeping aspect ratio square
+              child: Image.asset(
+                'assets/img/logo.png',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
 
-          // Profile Info
-          const Text(
-            'គណៈកម្មាធិការវិនិយោគកម្ពុជា', // Replace with actual username
-            style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF083E68)),
-          ),
-          const SizedBox(height: 10),
-
-          // Profile Info
-          const Text(
-            'Cambodian Investment Board', // Replace with actual username
-            style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF083E68)),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Logout Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity, // Full width button
-              child: ElevatedButton.icon(
-                onPressed: _handleLogout,
-                icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text(
-                  'Logout',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+            // Logout Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _handleLogout,
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text(
+                    'Logout',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade600,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
