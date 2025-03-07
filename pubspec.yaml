@@ -50,6 +50,7 @@ dependencies:
 
   
   
+  dartz: ^0.10.1
 
 dev_dependencies:
 
