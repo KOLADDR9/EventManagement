@@ -42,7 +42,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Flutter build directory
+# Build directories
 build/
 **/build/
 **/ios/Pods/
+web/build/
