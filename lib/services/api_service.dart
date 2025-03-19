@@ -88,14 +88,17 @@ class ApiService {
         },
       );
 
-      print('✅ Response: ${response.statusCode} - ${response.body}');
-
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data is Map && data['status'] == true && data['result'] is List) {
-          return (data['result'] as List)
+          List<Event> events = (data['result'] as List)
               .map((json) => Event.fromJson(json))
               .toList();
+          
+          // Sort events by start time to ensure proper date range processing
+          events.sort((a, b) => a.startTime.compareTo(b.startTime));
+          
+          return events;
         } else {
           throw Exception('Invalid API response format.');
         }

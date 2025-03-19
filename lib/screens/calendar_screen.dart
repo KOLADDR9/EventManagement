@@ -32,12 +32,25 @@ class _CalendarScreenState extends State<CalendarScreen>
     final Map<DateTime, List<Event>> eventsMap = {};
 
     for (var event in eventsList) {
-      final date = event.startTime;
-      final normalizedDate = _normalizeDate(date);
-      if (!eventsMap.containsKey(normalizedDate)) {
-        eventsMap[normalizedDate] = [];
+      DateTime startDate = _normalizeDate(event.startTime);
+      DateTime endDate = _normalizeDate(event.endTime);
+
+      if (startDate.isBefore(endDate) || startDate.isAtSameMomentAs(endDate)) {
+        DateTime currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+          if (!eventsMap.containsKey(currentDate)) {
+            eventsMap[currentDate] = [];
+          }
+          eventsMap[currentDate]?.add(event);
+          currentDate = currentDate.add(const Duration(days: 1));
+        }
+      } else {
+        // Handle single-day events or invalid date ranges
+        if (!eventsMap.containsKey(startDate)) {
+          eventsMap[startDate] = [];
+        }
+        eventsMap[startDate]?.add(event);
       }
-      eventsMap[normalizedDate]?.add(event);
     }
 
     return eventsMap;

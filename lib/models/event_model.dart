@@ -9,6 +9,7 @@ class Event {
   final String place;
   final String color;
   final List<Employee> employees;
+  final String createdBy; // Add this line
 
   Event({
     required this.id,
@@ -19,6 +20,7 @@ class Event {
     required this.place,
     required this.color,
     required this.employees,
+    required this.createdBy, // Add this line
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Event {
               ?.map((e) => Employee.fromJson(e))
               .toList() ??
           [],
+      createdBy: json['createdBy'] ?? '', // Add this line
     );
   }
 
@@ -47,6 +50,7 @@ class Event {
       'place': place,
       'color': color,
       'employees': employees.map((e) => e.toJson()).toList(),
+      'createdBy': createdBy, // Add this line
     };
   }
 

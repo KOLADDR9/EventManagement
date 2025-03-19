@@ -64,8 +64,16 @@ class CalendarSmallScreen extends StatelessWidget {
                         calendarFormat: calendarFormat,
                         startingDayOfWeek: StartingDayOfWeek.monday,
                         eventLoader: (date) {
-                          return events[_normalizeDate(date)] ??
-                              []; // Always returns a list (even if empty)
+                          final normalizedDate = _normalizeDate(date);
+                          final dayEvents = events[normalizedDate] ?? [];
+                          
+                          // Filter events that are active on this date
+                          return dayEvents.where((event) {
+                            final eventStart = _normalizeDate(event.startTime);
+                            final eventEnd = _normalizeDate(event.endTime);
+                            return !normalizedDate.isBefore(eventStart) && 
+                                   !normalizedDate.isAfter(eventEnd);
+                          }).toList();
                         },
                         selectedDayPredicate: (day) =>
                             isSameDay(day, selectedDate),
@@ -356,39 +364,43 @@ class CalendarSmallScreen extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0), // Padding inside the row
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Icon(Icons.access_time,
                                         color: Colors.black, size: 20.0),
                                     const SizedBox(width: 8),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: "ពេលវេលា: ",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15,
-                                                  color: Colors.black,
-                                                ),
-                                          ),
-                                          TextSpan(
-                                            text: isSameDay(event.startTime,
-                                                    selectedDate)
-                                                ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
-                                                : "${DateFormat("yyyy-MM-dd hh:mm a").format(event.startTime)} - ${DateFormat("yyyy-MM-dd hh:mm a").format(event.endTime)}",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 15,
-                                                  color: Colors.black,
-                                                ),
-                                          ),
-                                        ],
+                                    Expanded(
+                                      child: RichText(
+                                        softWrap: true,
+                                        overflow: TextOverflow.visible,
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "ពេលវេលា: ",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                  ),
+                                            ),
+                                            TextSpan(
+                                              text: !isSameDay(event.startTime, event.endTime)
+                                                  ? "${DateFormat("yyyy-MM-dd").format(event.startTime)} ${DateFormat("hh:mm a").format(event.startTime)}\n${DateFormat("yyyy-MM-dd").format(event.endTime)} ${DateFormat("hh:mm a").format(event.endTime)}"
+                                                  : "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.normal,
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -435,6 +447,39 @@ class CalendarSmallScreen extends StatelessWidget {
                                             ),
                                           ],
                                         ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              //  CreatedBy
+                              const SizedBox(height: 8),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.end, // Align to right
+                                  children: [
+                                    Icon(Icons.edit,
+                                        color: const Color.fromARGB(
+                                            255, 175, 175, 175),
+                                        size: 20.0),
+                                    const SizedBox(width: 8),
+                                    RichText(
+                                      text: TextSpan(
+                                        text:
+                                            event.createdBy ?? "មិនមានព័ត៌មាន",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 15,
+                                              color: const Color.fromARGB(
+                                                  255, 175, 175, 175),
+                                            ),
                                       ),
                                     ),
                                   ],
