@@ -65,6 +65,15 @@ class Event {
       }
     }
   }
+
+  bool isOnDate(DateTime date) {
+    final eventDate = DateTime(date.year, date.month, date.day);
+    final start = DateTime(startTime.year, startTime.month, startTime.day);
+    final end = DateTime(endTime.year, endTime.month, endTime.day);
+
+    return (eventDate.isAtSameMomentAs(start) || eventDate.isAfter(start)) &&
+        (eventDate.isAtSameMomentAs(end) || eventDate.isBefore(end));
+  }
 }
 
 class Employee {
