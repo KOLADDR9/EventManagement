@@ -414,7 +414,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                                 text: !isSameDay(
                                                         event.startTime,
                                                         event.endTime)
-                                                    ? "${DateFormat("yyyy-MM-dd").format(event.startTime)} ${DateFormat("hh:mm a").format(event.startTime)}\n${DateFormat("yyyy-MM-dd").format(event.endTime)} ${DateFormat("hh:mm a").format(event.endTime)}"
+                                                    ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
                                                     : "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}",
                                                 style: Theme.of(context)
                                                     .textTheme
@@ -493,7 +493,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.end, // Align to right
                                     children: [
-                                      Icon(Icons.edit,
+                                      Icon(Icons.checklist,
                                           color: const Color.fromARGB(
                                               255, 175, 175, 175),
                                           size: 20.0),
@@ -525,7 +525,7 @@ class CalendarLargeScreen extends StatelessWidget {
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
+                      "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.normal,
                             fontSize: 18,

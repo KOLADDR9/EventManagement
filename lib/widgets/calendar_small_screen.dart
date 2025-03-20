@@ -66,13 +66,13 @@ class CalendarSmallScreen extends StatelessWidget {
                         eventLoader: (date) {
                           final normalizedDate = _normalizeDate(date);
                           final dayEvents = events[normalizedDate] ?? [];
-                          
+
                           // Filter events that are active on this date
                           return dayEvents.where((event) {
                             final eventStart = _normalizeDate(event.startTime);
                             final eventEnd = _normalizeDate(event.endTime);
-                            return !normalizedDate.isBefore(eventStart) && 
-                                   !normalizedDate.isAfter(eventEnd);
+                            return !normalizedDate.isBefore(eventStart) &&
+                                !normalizedDate.isAfter(eventEnd);
                           }).toList();
                         },
                         selectedDayPredicate: (day) =>
@@ -387,14 +387,16 @@ class CalendarSmallScreen extends StatelessWidget {
                                                   ),
                                             ),
                                             TextSpan(
-                                              text: !isSameDay(event.startTime, event.endTime)
-                                                  ? "${DateFormat("yyyy-MM-dd").format(event.startTime)} ${DateFormat("hh:mm a").format(event.startTime)}\n${DateFormat("yyyy-MM-dd").format(event.endTime)} ${DateFormat("hh:mm a").format(event.endTime)}"
+                                              text: !isSameDay(event.startTime,
+                                                      event.endTime)
+                                                  ? "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}"
                                                   : "${DateFormat("hh:mm a").format(event.startTime)} - ${DateFormat("hh:mm a").format(event.endTime)}",
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyMedium
                                                   ?.copyWith(
-                                                    fontWeight: FontWeight.normal,
+                                                    fontWeight:
+                                                        FontWeight.normal,
                                                     fontSize: 15,
                                                     color: Colors.black,
                                                   ),
@@ -462,7 +464,7 @@ class CalendarSmallScreen extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.end, // Align to right
                                   children: [
-                                    Icon(Icons.edit,
+                                    Icon(Icons.checklist,
                                         color: const Color.fromARGB(
                                             255, 175, 175, 175),
                                         size: 20.0),
@@ -495,7 +497,7 @@ class CalendarSmallScreen extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
-                      "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ។",
+                      "ថ្ងៃនេះ មិនមានកិច្ចប្រជុំទេ",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.normal,
                             fontSize: 15,
