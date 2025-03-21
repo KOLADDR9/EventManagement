@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -65,7 +64,7 @@ class ApiService {
       }
       return false;
     } catch (e) {
-      print('🚨 Login error: $e');
+      //print('🚨 Login error: $e');
       return false;
     }
   }
@@ -94,10 +93,10 @@ class ApiService {
           List<Event> events = (data['result'] as List)
               .map((json) => Event.fromJson(json))
               .toList();
-          
+
           // Sort events by start time to ensure proper date range processing
           events.sort((a, b) => a.startTime.compareTo(b.startTime));
-          
+
           return events;
         } else {
           throw Exception('Invalid API response format.');
@@ -130,7 +129,7 @@ class ApiService {
       );
       return response.statusCode == 200;
     } catch (e) {
-      throw ('🚨 Token validation error: $e');
+      //throw ('🚨 Token validation error: $e');
       return false;
     }
   }
@@ -156,7 +155,7 @@ class ApiService {
         throw Exception('Failed to load user profile');
       }
     } catch (e) {
-      print('🚨 Error fetching user profile: $e');
+      //print('🚨 Error fetching user profile: $e');
       rethrow;
     }
   }

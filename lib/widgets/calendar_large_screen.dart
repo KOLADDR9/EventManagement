@@ -16,7 +16,7 @@ class CalendarLargeScreen extends StatelessWidget {
   final bool Function(DateTime) isWeekend;
 
   const CalendarLargeScreen({
-    Key? key,
+    super.key,
     required this.selectedDate,
     required this.eventDetails,
     required this.events,
@@ -26,7 +26,7 @@ class CalendarLargeScreen extends StatelessWidget {
     required this.parseColor,
     required this.getKhmerDayName,
     required this.isWeekend,
-  }) : super(key: key);
+  });
 
   // Add this helper method at class level
   DateTime _normalizeDate(DateTime date) {
@@ -53,7 +53,7 @@ class CalendarLargeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withAlpha(25),
                             blurRadius: 6.0,
                             offset: const Offset(0, 3),
                           ),
@@ -216,10 +216,13 @@ class CalendarLargeScreen extends StatelessWidget {
                                         );
                                       }),
                                       if (hasMoreEvents)
-                                        const Icon(
-                                          Icons.more_horiz,
-                                          size: 8.0,
-                                          color: Color(0xFF083E68),
+                                        Text(
+                                          '+${eventList.length - 3}',
+                                          style: const TextStyle(
+                                            fontSize: 8.0,
+                                            color: Color(0xFF083E68),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                     ],
                                   ),
@@ -286,7 +289,7 @@ class CalendarLargeScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12.0),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withAlpha(25),
                                   blurRadius: 6.0,
                                   offset: const Offset(0, 3),
                                 ),
@@ -406,7 +409,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                                     ?.copyWith(
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontSize: 15,
+                                                      fontSize: 18,
                                                       color: Colors.black,
                                                     ),
                                               ),
@@ -422,7 +425,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                                     ?.copyWith(
                                                       fontWeight:
                                                           FontWeight.normal,
-                                                      fontSize: 15,
+                                                      fontSize: 18,
                                                       color: Colors.black,
                                                     ),
                                               ),
@@ -500,8 +503,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                       const SizedBox(width: 8),
                                       RichText(
                                         text: TextSpan(
-                                          text: event.createdBy ??
-                                              "មិនមានព័ត៌មាន",
+                                          text: event.createdBy,
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyMedium

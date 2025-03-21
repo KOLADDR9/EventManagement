@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
-import '/theme/font_fm.dart';
 
 class CalendarSmallScreen extends StatelessWidget {
   final DateTime selectedDate;
@@ -16,7 +15,7 @@ class CalendarSmallScreen extends StatelessWidget {
   final bool Function(DateTime) isWeekend;
 
   const CalendarSmallScreen({
-    Key? key,
+    super.key,
     required this.selectedDate,
     required this.eventDetails,
     required this.events,
@@ -26,7 +25,7 @@ class CalendarSmallScreen extends StatelessWidget {
     required this.parseColor,
     required this.getKhmerDayName,
     required this.isWeekend,
-  }) : super(key: key);
+  });
 
   // Add this helper method at class level
   DateTime _normalizeDate(DateTime date) {
@@ -50,7 +49,7 @@ class CalendarSmallScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withAlpha(25),
                             blurRadius: 6.0,
                             offset: const Offset(0, 3),
                           ),
@@ -193,9 +192,6 @@ class CalendarSmallScreen extends StatelessWidget {
                                         .center, // Center alignment for event markers
                                     children: [
                                       ...limitedEvents.map((event) {
-                                        final eventObj = event as Event;
-                                        final color =
-                                            parseColor(eventObj.color);
                                         return Container(
                                           width: 6.0,
                                           height: 6.0,
@@ -208,10 +204,13 @@ class CalendarSmallScreen extends StatelessWidget {
                                         );
                                       }),
                                       if (hasMoreEvents)
-                                        const Icon(
-                                          Icons.more_horiz,
-                                          size: 8.0,
-                                          color: Color(0xFF083E68),
+                                        Text(
+                                          '+${eventList.length - 3}',
+                                          style: const TextStyle(
+                                            fontSize: 8.0,
+                                            color: Color(0xFF083E68),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                     ],
                                   ),
@@ -271,7 +270,7 @@ class CalendarSmallScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12.0),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withAlpha(25),
                                 blurRadius: 6.0,
                                 offset: const Offset(0, 3),
                               ),
@@ -471,8 +470,7 @@ class CalendarSmallScreen extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     RichText(
                                       text: TextSpan(
-                                        text:
-                                            event.createdBy ?? "មិនមានព័ត៌មាន",
+                                        text: event.createdBy,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium

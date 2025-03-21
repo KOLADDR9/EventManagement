@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:event_management_app/main.dart'; // Import MainScreen
 import 'package:event_management_app/services/api_service.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:universal_html/html.dart' as html;
+//import 'package:flutter/foundation.dart' show kIsWeb;
+//import 'package:universal_html/html.dart' as html;
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
