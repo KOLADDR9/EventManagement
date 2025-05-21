@@ -70,6 +70,8 @@ class _CalendarScreenState extends State<CalendarScreen>
     super.build(context); // Required by AutomaticKeepAliveClientMixin
 
     return Scaffold(
+      backgroundColor:
+          Color.fromARGB(235, 250, 252, 255), // Light blue background
       body: SafeArea(
         child: FutureBuilder<Map<DateTime, List<Event>>>(
           future: _eventsFuture,

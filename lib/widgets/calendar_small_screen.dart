@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CalendarSmallScreen extends StatelessWidget {
   final DateTime selectedDate;
@@ -27,13 +28,60 @@ class CalendarSmallScreen extends StatelessWidget {
     required this.isWeekend,
   });
 
+  Color _getEventStatusColor(Event event) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final eventDay = DateTime(
+        event.startTime.year, event.startTime.month, event.startTime.day);
+
+    if (eventDay.isBefore(today)) {
+      return Colors.grey; // Past day
+    } else if (eventDay.isAfter(today)) {
+      return Color.fromARGB(255, 241, 206, 6); // Future day
+    } else {
+      // Current day - check time
+      if (now.isAfter(event.startTime) && now.isBefore(event.endTime)) {
+        return Colors.green; // Ongoing meeting
+      } else if (now.isBefore(event.startTime)) {
+        return Color.fromARGB(255, 241, 206, 6); // Today's future meeting
+      } else {
+        return Colors.grey; // Today's past meeting
+      }
+    }
+  }
+
   // Add this helper method at class level
   DateTime _normalizeDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
 
+  void _sortEvents(List<Event> eventDetails) {
+    DateTime now = DateTime.now();
+    eventDetails.sort((a, b) {
+      Color colorA = _getEventStatusColor(a);
+      Color colorB = _getEventStatusColor(b);
+
+      // Define priority: Green (ongoing) = 0, Yellow (future) = 1, Gray (past) = 2
+      int getPriority(Color color) {
+        if (color == Colors.green) return 0;
+        if (color == Color.fromARGB(255, 241, 206, 6)) return 1;
+        return 2; // Gray
+      }
+
+      int priorityA = getPriority(colorA);
+      int priorityB = getPriority(colorB);
+
+      if (priorityA == priorityB) {
+        return a.startTime
+            .compareTo(b.startTime); // If same status, sort by time
+      }
+      return priorityA.compareTo(priorityB); // Sort by priority
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _sortEvents(eventDetails);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -294,6 +342,23 @@ class CalendarSmallScreen extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     const SizedBox(width: 8),
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      margin: const EdgeInsets.only(right: 8),
+                                      decoration: BoxDecoration(
+                                        color: _getEventStatusColor(event),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: _getEventStatusColor(event)
+                                                .withOpacity(0.5),
+                                            blurRadius: 4,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     Flexible(
                                       child: Text(
                                         event.title,
@@ -302,8 +367,6 @@ class CalendarSmallScreen extends StatelessWidget {
                                             .bodyLarge
                                             ?.copyWith(
                                               fontWeight: FontWeight.bold,
-                                              // color: Color(0xFF083E68),
-                                              // Don't specify color here to use the theme's color
                                             ),
                                         softWrap: true,
                                         overflow: TextOverflow.visible,
@@ -408,6 +471,62 @@ class CalendarSmallScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
+                              // Only show online link section if at least one employee has isOnline = 1
+                              if (event.employees
+                                  .any((e) => e.isOnline == true))
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.video_camera_front_outlined,
+                                          color: Colors.black, size: 20.0),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: RichText(
+                                          softWrap: true,
+                                          overflow: TextOverflow.visible,
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: "តំណភ្ជាប់: ",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15,
+                                                      color: Colors.black,
+                                                    ),
+                                              ),
+                                              TextSpan(
+                                                text: event.employees
+                                                    .firstWhere((e) =>
+                                                        e.isOnline == true)
+                                                    .onlineLink,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      fontSize: 15,
+                                                      color: Color(0xFF083E68),
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 8),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0), // Padding inside the row
@@ -453,6 +572,74 @@ class CalendarSmallScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              const SizedBox(height: 8),
+                              // Remove the first link section and keep only this one with proper handling
+                              // Remove the previous link section and use this one
+                              if (event.isOnline && event.onlineLink != null)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.video_camera_front_outlined,
+                                          color: Colors.black, size: 20.0),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            const meetingLink =
+                                                'https://meet.google.com/abc-defg-hij';
+                                            final uri = Uri.parse(meetingLink);
+                                            await launchUrl(
+                                              uri,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
+                                          },
+                                          child: RichText(
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: "តំណភ្ជាប់: ",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                      ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'https://meet.google.com/abc-defg-hij',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 15,
+                                                        color:
+                                                            Color(0xFF083E68),
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
                               //  CreatedBy
                               const SizedBox(height: 8),

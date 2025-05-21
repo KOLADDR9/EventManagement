@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Event {
   final int id;
@@ -9,7 +10,9 @@ class Event {
   final String place;
   final String color;
   final List<Employee> employees;
-  final String createdBy; // Add this line
+  final String createdBy;
+  final bool isOnline; // Add this
+  final String? onlineLink; // Add this
 
   Event({
     required this.id,
@@ -20,7 +23,9 @@ class Event {
     required this.place,
     required this.color,
     required this.employees,
-    required this.createdBy, // Add this line
+    required this.createdBy,
+    this.isOnline = false, // Add this
+    this.onlineLink, // Add this
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -36,7 +41,9 @@ class Event {
               ?.map((e) => Employee.fromJson(e))
               .toList() ??
           [],
-      createdBy: json['createdBy'] ?? '', // Add this line
+      createdBy: json['createdBy'] ?? '',
+      isOnline: json['is_online'] == 1, // Add this
+      onlineLink: json['online_link'], // Add this
     );
   }
 
@@ -50,7 +57,9 @@ class Event {
       'place': place,
       'color': color,
       'employees': employees.map((e) => e.toJson()).toList(),
-      'createdBy': createdBy, // Add this line
+      'createdBy': createdBy,
+      'is_online': isOnline ? 1 : 0, // Add this
+      'online_link': onlineLink, // Add this
     };
   }
 
@@ -78,21 +87,54 @@ class Event {
     return (eventDate.isAtSameMomentAs(start) || eventDate.isAfter(start)) &&
         (eventDate.isAtSameMomentAs(end) || eventDate.isBefore(end));
   }
+
+  Future<bool> checkOnlineLink() async {
+    if (!isOnline || onlineLink == null || onlineLink!.isEmpty) {
+      return false;
+    }
+
+    final uri = Uri.tryParse(onlineLink!);
+    if (uri == null) {
+      return false;
+    }
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        return true;
+      }
+    } catch (e) {
+      print('Error checking link: $e');
+    }
+    return false;
+  }
+
+  Future<bool> launchOnlineLink() async {
+    if (await checkOnlineLink()) {
+      return launchUrl(Uri.parse(onlineLink!));
+    }
+    return false;
+  }
 }
 
 class Employee {
   final int employeeId;
   final String name;
+  final bool isOnline;
+  final String? onlineLink;
 
   Employee({
     required this.employeeId,
     required this.name,
+    this.isOnline = false,
+    this.onlineLink,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {
     return Employee(
       employeeId: json['employee_id'],
       name: json['name'],
+      isOnline: json['is_online'] == 1,
+      onlineLink: json['online_link'],
     );
   }
 
@@ -100,6 +142,8 @@ class Employee {
     return {
       'employee_id': employeeId,
       'name': name,
+      'is_online': isOnline ? 1 : 0,
+      'online_link': onlineLink,
     };
   }
 }

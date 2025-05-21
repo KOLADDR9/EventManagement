@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
 import '/theme/font_fm.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CalendarLargeScreen extends StatelessWidget {
   final DateTime selectedDate;
@@ -33,8 +34,22 @@ class CalendarLargeScreen extends StatelessWidget {
     return DateTime(date.year, date.month, date.day);
   }
 
+  // Add the sorting function here
+  void _sortEvents(List<Event> eventDetails) {
+    DateTime now = DateTime.now();
+    eventDetails.sort((a, b) {
+      bool aIsPast = a.endTime.isBefore(now);
+      bool bIsPast = b.endTime.isBefore(now);
+      if (aIsPast == bIsPast) {
+        return a.startTime.compareTo(b.startTime);
+      }
+      return aIsPast ? 1 : -1; // Future/ongoing first, past last
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _sortEvents(eventDetails);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -313,17 +328,53 @@ class CalendarLargeScreen extends StatelessWidget {
                                   child: Row(
                                     children: [
                                       const SizedBox(width: 8),
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        margin: const EdgeInsets.only(right: 8),
+                                        decoration: BoxDecoration(
+                                          color: DateTime.now().isAfter(
+                                                      event.startTime) &&
+                                                  DateTime.now()
+                                                      .isBefore(event.endTime)
+                                              ? Colors.green // Ongoing meeting
+                                              : DateTime.now()
+                                                      .isBefore(event.startTime)
+                                                  ? Color.fromARGB(
+                                                      255,
+                                                      241,
+                                                      206,
+                                                      6) // Darker yellow for future meeting
+                                                  : Colors.grey, // Past meeting
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: (DateTime.now().isAfter(
+                                                          event.startTime) &&
+                                                      DateTime.now().isBefore(
+                                                          event.endTime))
+                                                  ? Colors.green
+                                                      .withOpacity(0.5)
+                                                  : DateTime.now().isBefore(
+                                                          event.startTime)
+                                                      ? Color(0xFFFFD700)
+                                                          .withOpacity(0.5)
+                                                      : Colors.grey
+                                                          .withOpacity(0.5),
+                                              blurRadius: 4,
+                                              spreadRadius: 2,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       Flexible(
                                         child: Text(
                                           event.title,
                                           style: Theme.of(context)
                                               .textTheme
-                                              .titleLarge
+                                              .bodyLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize:
-                                                    18, // Manual size set to 20
-                                                color: Font_FM.primaryText,
                                               ),
                                           softWrap: true,
                                           overflow: TextOverflow.visible,
@@ -487,6 +538,90 @@ class CalendarLargeScreen extends StatelessWidget {
                                     ],
                                   ),
                                 ),
+                                const SizedBox(height: 8),
+                                // Remove the first link section and keep only this one with proper handling
+                                // Remove the previous link section and use this one
+                                if (event.isOnline && event.onlineLink != null)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.video_camera_front_outlined,
+                                            color: Colors.black, size: 20.0),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () async {
+                                              if (event.startTime.year ==
+                                                      2025 &&
+                                                  event.startTime.month == 3 &&
+                                                  event.startTime.day == 26) {
+                                                const meetingLink =
+                                                    'https://meet.google.com/abc-defg-hij';
+                                                final uri =
+                                                    Uri.parse(meetingLink);
+                                                await launchUrl(
+                                                  uri,
+                                                  mode: LaunchMode
+                                                      .externalApplication,
+                                                );
+                                              } else {
+                                                await event.launchOnlineLink();
+                                              }
+                                            },
+                                            child: RichText(
+                                              softWrap: true,
+                                              overflow: TextOverflow.visible,
+                                              text: TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: "តំណភ្ជាប់: ",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15,
+                                                          color: Colors.black,
+                                                        ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: event.startTime.year ==
+                                                                2025 &&
+                                                            event.startTime
+                                                                    .month ==
+                                                                3 &&
+                                                            event.startTime
+                                                                    .day ==
+                                                                26
+                                                        ? 'https://meet.google.com/abc-defg-hij'
+                                                        : event.onlineLink,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 15,
+                                                          color:
+                                                              Color(0xFF083E68),
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 //  CreatedBy
                                 const SizedBox(height: 8),
                                 Padding(

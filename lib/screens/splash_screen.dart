@@ -18,8 +18,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> checkAuth() async {
+    await Future.delayed(const Duration(seconds: 2));
     final hasToken = await apiService.hasValidToken();
 
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -29,29 +31,25 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double logoSize = width * 0.4; // 40% of screen width
-
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF083E68), // Dark blue
-              Color(0xFF107BCE), // Light blue
+              Color(0xFF083E68),
+              Color(0xFF107BCE),
             ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         child: Center(
           child: Image.asset(
-            'assets/img/logo.png',
-            width: logoSize, // Dynamically calculated logo size
-            height: logoSize, // Dynamically calculated logo size
+            'assets/img/cdc_logo.png',
+            width: 150,
+            height: 150,
             fit: BoxFit.contain,
           ),
         ),
