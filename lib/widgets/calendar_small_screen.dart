@@ -56,7 +56,6 @@ class CalendarSmallScreen extends StatelessWidget {
   }
 
   void _sortEvents(List<Event> eventDetails) {
-    DateTime now = DateTime.now();
     eventDetails.sort((a, b) {
       Color colorA = _getEventStatusColor(a);
       Color colorB = _getEventStatusColor(b);
@@ -471,9 +470,11 @@ class CalendarSmallScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              // Only show online link section if at least one employee has isOnline = 1
-                              if (event.employees
-                                  .any((e) => e.isOnline == true))
+                              // Remove the first link section and keep only this one with proper handling
+                              // Remove the previous link section and use this one
+                              if (event.isOnline &&
+                                  event.onlineLink != null &&
+                                  event.onlineLink!.isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12.0),
@@ -485,47 +486,52 @@ class CalendarSmallScreen extends StatelessWidget {
                                           color: Colors.black, size: 20.0),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: RichText(
-                                          softWrap: true,
-                                          overflow: TextOverflow.visible,
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: "តំណភ្ជាប់: ",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.black,
-                                                    ),
-                                              ),
-                                              TextSpan(
-                                                text: event.employees
-                                                    .firstWhere((e) =>
-                                                        e.isOnline == true)
-                                                    .onlineLink,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      fontSize: 15,
-                                                      color: Color(0xFF083E68),
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                    ),
-                                              ),
-                                            ],
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            await event.launchOnlineLink();
+                                          },
+                                          child: RichText(
+                                            softWrap: true,
+                                            overflow: TextOverflow.visible,
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: "តំណភ្ជាប់: ",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.black,
+                                                      ),
+                                                ),
+                                                TextSpan(
+                                                  text: event.onlineLink,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        fontSize: 15,
+                                                        color:
+                                                            Color(0xFF083E68),
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
+
                               const SizedBox(height: 8),
                               Padding(
                                 padding: const EdgeInsets.symmetric(

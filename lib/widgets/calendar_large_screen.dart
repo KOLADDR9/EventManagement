@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/event_model.dart';
 import '/theme/font_fm.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CalendarLargeScreen extends StatelessWidget {
   final DateTime selectedDate;
@@ -538,10 +537,9 @@ class CalendarLargeScreen extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                // Remove the first link section and keep only this one with proper handling
-                                // Remove the previous link section and use this one
-                                if (event.isOnline && event.onlineLink != null)
+                                if (event.isOnline &&
+                                    event.onlineLink != null &&
+                                    event.onlineLink!.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 12.0),
@@ -555,22 +553,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () async {
-                                              if (event.startTime.year ==
-                                                      2025 &&
-                                                  event.startTime.month == 3 &&
-                                                  event.startTime.day == 26) {
-                                                const meetingLink =
-                                                    'https://meet.google.com/abc-defg-hij';
-                                                final uri =
-                                                    Uri.parse(meetingLink);
-                                                await launchUrl(
-                                                  uri,
-                                                  mode: LaunchMode
-                                                      .externalApplication,
-                                                );
-                                              } else {
-                                                await event.launchOnlineLink();
-                                              }
+                                              await event.launchOnlineLink();
                                             },
                                             child: RichText(
                                               softWrap: true,
@@ -590,16 +573,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                                         ),
                                                   ),
                                                   TextSpan(
-                                                    text: event.startTime.year ==
-                                                                2025 &&
-                                                            event.startTime
-                                                                    .month ==
-                                                                3 &&
-                                                            event.startTime
-                                                                    .day ==
-                                                                26
-                                                        ? 'https://meet.google.com/abc-defg-hij'
-                                                        : event.onlineLink,
+                                                    text: event.onlineLink,
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium
@@ -622,6 +596,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                       ],
                                     ),
                                   ),
+
                                 //  CreatedBy
                                 const SizedBox(height: 8),
                                 Padding(
