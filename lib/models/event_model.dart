@@ -11,8 +11,9 @@ class Event {
   final String color;
   final List<Employee> employees;
   final String createdBy;
-  final bool isOnline; // Add this
-  final String? onlineLink; // Add this
+  final bool isOnline;
+  final String? onlineLink;
+  final String? documentLink;
 
   Event({
     required this.id,
@@ -24,8 +25,9 @@ class Event {
     required this.color,
     required this.employees,
     required this.createdBy,
-    this.isOnline = false, // Add this
-    this.onlineLink, // Add this
+    this.isOnline = false,
+    this.onlineLink,
+    this.documentLink,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -42,8 +44,9 @@ class Event {
               .toList() ??
           [],
       createdBy: json['createdBy'] ?? '',
-      isOnline: json['is_online'] == 1, // Add this
-      onlineLink: json['online_link'], // Add this
+      isOnline: json['is_online'] == 1,
+      onlineLink: json['online_link'],
+      documentLink: json['document_link'],
     );
   }
 
@@ -58,8 +61,9 @@ class Event {
       'color': color,
       'employees': employees.map((e) => e.toJson()).toList(),
       'createdBy': createdBy,
-      'is_online': isOnline ? 1 : 0, // Add this
-      'online_link': onlineLink, // Add this
+      'is_online': isOnline ? 1 : 0,
+      'online_link': onlineLink,
+      'document_link': documentLink,
     };
   }
 
@@ -69,7 +73,7 @@ class Event {
     }
     try {
       return DateTime.parse(dateStr);
-    } catch (e) {
+    } catch (_) {
       try {
         return DateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
       } catch (e) {
@@ -89,30 +93,45 @@ class Event {
   }
 
   Future<bool> checkOnlineLink() async {
-    if (!isOnline || onlineLink == null || onlineLink!.isEmpty) {
-      return false;
-    }
+    return _checkLinkValidity(onlineLink);
+  }
 
-    final uri = Uri.tryParse(onlineLink!);
-    if (uri == null) {
-      return false;
-    }
-
-    try {
-      if (await canLaunchUrl(uri)) {
-        return true;
-      }
-    } catch (e) {
-      print('Error checking link: $e');
-    }
-    return false;
+  Future<bool> checkDocumentLink() async {
+    return _checkLinkValidity(documentLink);
   }
 
   Future<bool> launchOnlineLink() async {
-    if (await checkOnlineLink()) {
-      return launchUrl(Uri.parse(onlineLink!));
+    return _launchLink(onlineLink);
+  }
+
+  Future<bool> launchDocumentLink() async {
+    return _launchLink(documentLink);
+  }
+
+  Future<bool> _checkLinkValidity(String? link) async {
+    if (link == null || link.isEmpty) return false;
+    final uri = Uri.tryParse(link);
+    if (uri == null) return false;
+
+    try {
+      return await canLaunchUrl(uri);
+    } catch (e) {
+      print('Error checking link: $e');
+      return false;
     }
-    return false;
+  }
+
+  Future<bool> _launchLink(String? link) async {
+    if (link == null || link.isEmpty) return false;
+    final uri = Uri.tryParse(link);
+    if (uri == null) return false;
+
+    try {
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print('Error launching link: $e');
+      return false;
+    }
   }
 }
 
@@ -121,12 +140,14 @@ class Employee {
   final String name;
   final bool isOnline;
   final String? onlineLink;
+  final String? documentLink;
 
   Employee({
     required this.employeeId,
     required this.name,
     this.isOnline = false,
     this.onlineLink,
+    this.documentLink,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {
@@ -135,6 +156,7 @@ class Employee {
       name: json['name'],
       isOnline: json['is_online'] == 1,
       onlineLink: json['online_link'],
+      documentLink: json['document_link'],
     );
   }
 
@@ -144,6 +166,28 @@ class Employee {
       'name': name,
       'is_online': isOnline ? 1 : 0,
       'online_link': onlineLink,
+      'document_link': documentLink,
     };
+  }
+
+  Future<bool> launchOnlineLink() async {
+    return _launchLink(onlineLink);
+  }
+
+  Future<bool> launchDocumentLink() async {
+    return _launchLink(documentLink);
+  }
+
+  Future<bool> _launchLink(String? link) async {
+    if (link == null || link.isEmpty) return false;
+    final uri = Uri.tryParse(link);
+    if (uri == null) return false;
+
+    try {
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print('Error launching link: $e');
+      return false;
+    }
   }
 }

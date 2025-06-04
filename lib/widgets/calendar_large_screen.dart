@@ -318,8 +318,7 @@ class CalendarLargeScreen extends StatelessWidget {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(
-                                        int.parse(parseColor(event.color))),
+                                    color: Color.fromARGB(255, 193, 222, 247),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   padding: const EdgeInsets.symmetric(
@@ -336,15 +335,20 @@ class CalendarLargeScreen extends StatelessWidget {
                                                       event.startTime) &&
                                                   DateTime.now()
                                                       .isBefore(event.endTime)
-                                              ? Colors.green // Ongoing meeting
+                                              ? const Color.fromARGB(255, 0,
+                                                  255, 8) // Ongoing meeting
                                               : DateTime.now()
                                                       .isBefore(event.startTime)
                                                   ? Color.fromARGB(
                                                       255,
-                                                      241,
-                                                      206,
-                                                      6) // Darker yellow for future meeting
-                                                  : Colors.grey, // Past meeting
+                                                      255,
+                                                      217,
+                                                      1) // Darker yellow for future meeting
+                                                  : const Color.fromARGB(
+                                                      255,
+                                                      71,
+                                                      71,
+                                                      71), // Past meeting
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
@@ -352,15 +356,18 @@ class CalendarLargeScreen extends StatelessWidget {
                                                           event.startTime) &&
                                                       DateTime.now().isBefore(
                                                           event.endTime))
-                                                  ? Colors.green
+                                                  ? const Color.fromARGB(
+                                                          255, 0, 0, 0)
                                                       .withOpacity(0.5)
                                                   : DateTime.now().isBefore(
                                                           event.startTime)
-                                                      ? Color(0xFFFFD700)
+                                                      ? Color.fromARGB(
+                                                              255, 0, 0, 0)
                                                           .withOpacity(0.5)
-                                                      : Colors.grey
+                                                      : const Color.fromARGB(
+                                                              255, 0, 0, 0)
                                                           .withOpacity(0.5),
-                                              blurRadius: 4,
+                                              blurRadius: 1,
                                               spreadRadius: 2,
                                             ),
                                           ],
@@ -486,7 +493,189 @@ class CalendarLargeScreen extends StatelessWidget {
                                     ],
                                   ),
                                 ),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (event.documentLink?.isNotEmpty ?? false)
+                                      const SizedBox(height: 8),
+                                    if (event.documentLink?.isNotEmpty ?? false)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.description_outlined,
+                                                color: Colors.black,
+                                                size: 20.0),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MouseRegion(
+                                                cursor:
+                                                    SystemMouseCursors.click,
+                                                child: GestureDetector(
+                                                  onTap: () async {
+                                                    final success = await event
+                                                        .launchDocumentLink();
+                                                    if (!success) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              "មិនអាចបើកតំណភ្ជាប់ឯកសារបានទេ"),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                  child: RichText(
+                                                    softWrap: true,
+                                                    overflow:
+                                                        TextOverflow.visible,
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text:
+                                                              "តំណភ្ជាប់ឯកសារ: ",
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        18,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: event
+                                                              .documentLink,
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    fontSize:
+                                                                        18,
+                                                                    color: const Color(
+                                                                        0xFF083E68),
+                                                                    decoration:
+                                                                        TextDecoration
+                                                                            .underline,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
+
+                                //const SizedBox(height: 8),
+
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (event.isOnline &&
+                                        event.onlineLink != null &&
+                                        event.onlineLink!.isNotEmpty)
+                                      const SizedBox(height: 8),
+                                    if (event.isOnline &&
+                                        event.onlineLink != null &&
+                                        event.onlineLink!.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                                Icons
+                                                    .video_camera_front_outlined,
+                                                color: Colors.black,
+                                                size: 20.0),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: MouseRegion(
+                                                cursor:
+                                                    SystemMouseCursors.click,
+                                                child: GestureDetector(
+                                                  onTap: () async {
+                                                    await event
+                                                        .launchOnlineLink();
+                                                  },
+                                                  child: RichText(
+                                                    softWrap: true,
+                                                    overflow:
+                                                        TextOverflow.visible,
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text:
+                                                              "តំណភ្ជាប់កិច្ចប្រជុំ: ",
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        18,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                        ),
+                                                        TextSpan(
+                                                          text:
+                                                              event.onlineLink,
+                                                          style:
+                                                              Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    fontSize:
+                                                                        18,
+                                                                    color: const Color(
+                                                                        0xFF083E68),
+                                                                    decoration:
+                                                                        TextDecoration
+                                                                            .underline,
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
+
                                 const SizedBox(height: 8),
+
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal:
@@ -537,65 +726,6 @@ class CalendarLargeScreen extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                if (event.isOnline &&
-                                    event.onlineLink != null &&
-                                    event.onlineLink!.isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(Icons.video_camera_front_outlined,
-                                            color: Colors.black, size: 20.0),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () async {
-                                              await event.launchOnlineLink();
-                                            },
-                                            child: RichText(
-                                              softWrap: true,
-                                              overflow: TextOverflow.visible,
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: "តំណភ្ជាប់: ",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 15,
-                                                          color: Colors.black,
-                                                        ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: event.onlineLink,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.copyWith(
-                                                          fontWeight:
-                                                              FontWeight.normal,
-                                                          fontSize: 15,
-                                                          color:
-                                                              Color(0xFF083E68),
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
 
                                 //  CreatedBy
                                 const SizedBox(height: 8),

@@ -332,8 +332,7 @@ class CalendarSmallScreen extends StatelessWidget {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color:
-                                      Color(int.parse(parseColor(event.color))),
+                                  color: Color.fromARGB(255, 193, 222, 247),
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 padding: const EdgeInsets.symmetric(
@@ -346,13 +345,37 @@ class CalendarSmallScreen extends StatelessWidget {
                                       height: 8,
                                       margin: const EdgeInsets.only(right: 8),
                                       decoration: BoxDecoration(
-                                        color: _getEventStatusColor(event),
+                                        color: DateTime.now()
+                                                    .isAfter(event.startTime) &&
+                                                DateTime.now()
+                                                    .isBefore(event.endTime)
+                                            ? const Color.fromARGB(255, 0, 255,
+                                                8) // Ongoing meeting
+                                            : DateTime.now()
+                                                    .isBefore(event.startTime)
+                                                ? Color.fromARGB(255, 255, 217,
+                                                    1) // Darker yellow for future meeting
+                                                : const Color.fromARGB(255, 71,
+                                                    71, 71), // Past meeting
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: _getEventStatusColor(event)
-                                                .withOpacity(0.5),
-                                            blurRadius: 4,
+                                            color: (DateTime.now().isAfter(
+                                                        event.startTime) &&
+                                                    DateTime.now().isBefore(
+                                                        event.endTime))
+                                                ? const Color.fromARGB(
+                                                        255, 0, 0, 0)
+                                                    .withOpacity(0.5)
+                                                : DateTime.now().isBefore(
+                                                        event.startTime)
+                                                    ? Color.fromARGB(
+                                                            255, 0, 0, 0)
+                                                        .withOpacity(0.5)
+                                                    : const Color.fromARGB(
+                                                            255, 0, 0, 0)
+                                                        .withOpacity(0.5),
+                                            blurRadius: 1,
                                             spreadRadius: 2,
                                           ),
                                         ],
@@ -469,68 +492,172 @@ class CalendarSmallScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              // Remove the first link section and keep only this one with proper handling
-                              // Remove the previous link section and use this one
-                              if (event.isOnline &&
-                                  event.onlineLink != null &&
-                                  event.onlineLink!.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(Icons.video_camera_front_outlined,
-                                          color: Colors.black, size: 20.0),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            await event.launchOnlineLink();
-                                          },
-                                          child: RichText(
-                                            softWrap: true,
-                                            overflow: TextOverflow.visible,
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: "តំណភ្ជាប់: ",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 15,
-                                                        color: Colors.black,
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (event.documentLink?.isNotEmpty ?? false)
+                                    const SizedBox(height: 8),
+                                  if (event.documentLink?.isNotEmpty ?? false)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Icon(Icons.description_outlined,
+                                              color: Colors.black, size: 20.0),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: MouseRegion(
+                                              cursor: SystemMouseCursors.click,
+                                              child: GestureDetector(
+                                                onTap: () async {
+                                                  final success = await event
+                                                      .launchDocumentLink();
+                                                  if (!success) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            "មិនអាចបើកតំណភ្ជាប់ឯកសារបានទេ"),
                                                       ),
-                                                ),
-                                                TextSpan(
-                                                  text: event.onlineLink,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: 15,
-                                                        color:
-                                                            Color(0xFF083E68),
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline,
+                                                    );
+                                                  }
+                                                },
+                                                child: RichText(
+                                                  softWrap: true,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                  text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            "តំណភ្ជាប់ឯកសារ: ",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 15,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
                                                       ),
+                                                      TextSpan(
+                                                        text:
+                                                            event.documentLink,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 15,
+                                                              color: const Color(
+                                                                  0xFF083E68),
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .underline,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                ],
+                              ),
+
+                              //const SizedBox(height: 8),
+
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (event.isOnline &&
+                                      event.onlineLink != null &&
+                                      event.onlineLink!.isNotEmpty)
+                                    const SizedBox(height: 8),
+                                  if (event.isOnline &&
+                                      event.onlineLink != null &&
+                                      event.onlineLink!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Icon(
+                                              Icons.video_camera_front_outlined,
+                                              color: Colors.black,
+                                              size: 20.0),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: MouseRegion(
+                                              cursor: SystemMouseCursors.click,
+                                              child: GestureDetector(
+                                                onTap: () async {
+                                                  await event
+                                                      .launchOnlineLink();
+                                                },
+                                                child: RichText(
+                                                  softWrap: true,
+                                                  overflow:
+                                                      TextOverflow.visible,
+                                                  text: TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            "តំណភ្ជាប់កិច្ចប្រជុំ: ",
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 15,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: event.onlineLink,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyMedium
+                                                            ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontSize: 15,
+                                                              color: const Color(
+                                                                  0xFF083E68),
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .underline,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
 
                               const SizedBox(height: 8),
                               Padding(
@@ -578,75 +705,6 @@ class CalendarSmallScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              // Remove the first link section and keep only this one with proper handling
-                              // Remove the previous link section and use this one
-                              if (event.isOnline && event.onlineLink != null)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(Icons.video_camera_front_outlined,
-                                          color: Colors.black, size: 20.0),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            const meetingLink =
-                                                'https://meet.google.com/abc-defg-hij';
-                                            final uri = Uri.parse(meetingLink);
-                                            await launchUrl(
-                                              uri,
-                                              mode: LaunchMode
-                                                  .externalApplication,
-                                            );
-                                          },
-                                          child: RichText(
-                                            softWrap: true,
-                                            overflow: TextOverflow.visible,
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: "តំណភ្ជាប់: ",
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 15,
-                                                        color: Colors.black,
-                                                      ),
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      'https://meet.google.com/abc-defg-hij',
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        fontWeight:
-                                                            FontWeight.normal,
-                                                        fontSize: 15,
-                                                        color:
-                                                            Color(0xFF083E68),
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
                               //  CreatedBy
                               const SizedBox(height: 8),
                               Padding(

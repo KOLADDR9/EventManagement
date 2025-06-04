@@ -8,6 +8,7 @@ import '../models/event_model.dart';
 class ApiService {
   static const String baseUrl = 'https://meeting-stage.cib-cdc.com/api';
   static const String apiUrl = 'https://meeting-stage.cib-cdc.com/api/meetings';
+
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   /// Save token (handles both mobile and web storage)
