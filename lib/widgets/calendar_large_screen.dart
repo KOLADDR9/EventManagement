@@ -381,6 +381,7 @@ class CalendarLargeScreen extends StatelessWidget {
                                               .bodyLarge
                                               ?.copyWith(
                                                 fontWeight: FontWeight.bold,
+                                                fontSize: 18,
                                               ),
                                           softWrap: true,
                                           overflow: TextOverflow.visible,

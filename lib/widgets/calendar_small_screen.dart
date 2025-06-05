@@ -389,6 +389,7 @@ class CalendarSmallScreen extends StatelessWidget {
                                             .bodyLarge
                                             ?.copyWith(
                                               fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
                                         softWrap: true,
                                         overflow: TextOverflow.visible,
