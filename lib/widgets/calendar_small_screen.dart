@@ -736,6 +736,30 @@ class CalendarSmallScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.end, // Align to right
+                                  children: [
+                                    RichText(
+                                      text: TextSpan(
+                                        text: event.createdTime,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 15,
+                                              color: const Color.fromARGB(
+                                                  255, 175, 175, 175),
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),

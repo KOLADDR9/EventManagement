@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 class Event {
   final int id;
   final String title;
+  final String createdTime;
   final DateTime startTime;
   final DateTime endTime;
   final String type;
@@ -18,6 +19,7 @@ class Event {
   Event({
     required this.id,
     required this.title,
+    required this.createdTime,
     required this.startTime,
     required this.endTime,
     required this.type,
@@ -34,6 +36,7 @@ class Event {
     return Event(
       id: json['id'],
       title: json['title'],
+      createdTime: json['created_at_formatted'],
       startTime: _parseDate(json['start'] ?? ''),
       endTime: _parseDate(json['end'] ?? ''),
       type: json['type'],
@@ -54,6 +57,7 @@ class Event {
     return {
       'id': id,
       'title': title,
+      'created_at_formatted': createdTime,
       'start': DateFormat("yyyy-MM-dd HH:mm:ss").format(startTime),
       'end': DateFormat("yyyy-MM-dd HH:mm:ss").format(endTime),
       'type': type,
