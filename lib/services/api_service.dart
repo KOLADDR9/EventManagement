@@ -6,8 +6,8 @@ import 'package:universal_html/html.dart' as html;
 import '../models/event_model.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
-  static const String apiUrl = 'http://127.0.0.1:8000/api/meetings';
+  static const String baseUrl = 'https://meeting-stage.cib-cdc.com/api';
+  static const String apiUrl = 'https://meeting-stage.cib-cdc.com/api/meetings';
 
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 

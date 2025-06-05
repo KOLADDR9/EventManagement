@@ -2,9 +2,9 @@
 
 class Config {
   // Base URLs
-  static const String apiUrlDev = 'http://127.0.0.1:8000/api';
-  static const String apiUrlStaging = 'http://127.0.0.1:8000/api';
-  static const String apiUrlProd = 'http://127.0.0.1:8000/api';
+  static const String apiUrlDev = 'https://meeting-stage.cib-cdc.com/api';
+  static const String apiUrlStaging = 'https://meeting-stage.cib-cdc.com/api';
+  static const String apiUrlProd = 'https://meeting-stage.cib-cdc.com/api';
 
   // Current active URL
   static const String baseUrl = apiUrlDev;

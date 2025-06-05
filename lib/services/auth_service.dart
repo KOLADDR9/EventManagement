@@ -8,7 +8,7 @@ import 'package:universal_html/html.dart' as html;
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
-  static const String _baseUrl = 'http://127.0.0.1:8000/api';
+  static const String _baseUrl = 'https://meeting-stage.cib-cdc.com/api';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   // Login method
